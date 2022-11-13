@@ -1,0 +1,1 @@
+/home/nano/Documents/projects/mudeer/masdar/softkeys.clipboard.js

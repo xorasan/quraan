@@ -1,0 +1,1 @@
+/home/nano/Documents/projects/mudeer/taraajim/en.translate.slang

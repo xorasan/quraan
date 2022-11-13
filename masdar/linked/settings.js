@@ -1,0 +1,1 @@
+/home/nano/Documents/projects/mudeer/masdar/settings.js

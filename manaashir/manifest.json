@@ -1,0 +1,33 @@
+{
+	"version": "0.3.3",
+	"name": "quraan",
+	"subtitle": "",
+	"description": "",
+	"display": "standalone",
+	"fullscreen": "",
+	"cursor": "false",
+	"type": "privileged",
+	"launch_path": "/quraan/index.html",
+	"developer": {
+		"name": "Hasan Xorasani",
+		"url": "mailto:hxorasani@gmail.com"
+	},
+	"locales": {
+		"en-US": {
+			"name": "quraan",
+			"subtitle": "",
+			"description": ""
+		}
+	},
+	"default_locale": "en-US",
+	"icons": [
+		{
+			"src": "/quraan/0.png",
+			"sizes": "56x56"
+		},
+		{
+			"src": "/quraan/1.png",
+			"sizes": "112x112"
+		}
+	]
+}
