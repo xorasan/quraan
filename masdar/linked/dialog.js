@@ -1,1 +1,0 @@
-/home/nano/Documents/projects/mudeer/masdar/dialog.js
