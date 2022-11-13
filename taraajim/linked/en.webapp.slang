@@ -1,1 +1,0 @@
-/home/nano/Documents/projects/mudeer/taraajim/en.webapp.slang

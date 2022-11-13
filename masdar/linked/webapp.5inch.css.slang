@@ -1,1 +1,0 @@
-/home/nano/Documents/projects/mudeer/masdar/webapp.5inch.css.slang
