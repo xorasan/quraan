@@ -11,14 +11,12 @@ body
 			[id=current] .current .absolute
 		[id=text] @dir(rtl) .matn
 		[id=text2] @dir(rtl) .matn .dim
-
 		[fullscreen=1] .maHdood
 	[view=surahs]
 		[id=list]
-
 	[template=soorahli] .soorahli .listitem .flex
-			.flex .start .vertical .shrink .vcenter .padv
-				[id=matn] .pad .matn
-			.small .dim .vcenter
-				img src() [id=soorah] .soorah
+		.flex .start .vertical .shrink .vcenter .padv
+			[id=matn] .pad .matn
+		.small .dim .vcenter
+			img src() [id=soorah] .soorah
 
