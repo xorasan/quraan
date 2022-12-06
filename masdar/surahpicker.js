@@ -18,11 +18,11 @@ var surahpicker, surahslist;
 		for (var i = 1; i <= 114; ++i) {
 			var metadata = meta.surahs[i];
 			surahslist.set({
-				id: i,
+				id: i-1,
 				XPO.title: i + ' ' + metadata[4],
 				XPO.body: metadata[6],
 				XPO.subtitle: metadata[1] +' '+ translate('ayaat'),
-			}, i-1); // to correctly index them in the list adapter
+			}); // to correctly index them in the list adapter
 		}
 		surahslist.onpress = function (item, key, i) {
 			if (key === K.en) {

@@ -128,7 +128,6 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 				if (splat[2] && splat[2].length)
 					meanings[splat[0]] = splat[2];
 			});
-			
 			lines.forEach(function (line) {
 				var index = line.split('|'),
 					s = index[0],
@@ -270,6 +269,8 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 	});
 	Hooks.set('XPO.bahac', function (rawstring) {
 		var string = nazzaf(rawstring).trim();
+		// TODO
+//		if (string.match(/[0-9\:]*/i))
 		if (string.length) {
 			var results = [], count = 0, surahcount = 0;
 			for (var i = 1; i <= 114 && surahcount < 3; ++i) {

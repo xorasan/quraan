@@ -38,6 +38,7 @@ _katabmowdoo3       _katabmowdoo3
 _replacements       _replacements
 justifycenter       justifycenter
 narrowletters       narrowletters
+showmeanings        showmeanings
 transparency        transparency
 keyboardopen        keyboardopen
 bahaconpress        bahaconpress
@@ -46,7 +47,6 @@ bodyshowhtml        bodyshowhtml
 visiblesheet        visiblesheet
 dynamicstyle        dynamicstyle
 globalplayer        globalplayer
-showmeanings        showmeanings
 iconmorevert        iconmorevert
 taxeercancel        taxeercancel
 queuerequest        queuerequest
@@ -67,6 +67,7 @@ uponpastend         uponpastend
 actualpress         actualpress
 hizbquarter         hizbquarter
 vcenterkids         vcenterkids
+bookmarked          bookmarked
 noprofiles          noprofiles
 secondsago          secondsago
 aminuteago          aminuteago
@@ -87,7 +88,6 @@ secondaryt          secondaryt
 themecolor          themecolor
 navigation          navigation
 tempscript          tempscript
-bookmarked          bookmarked
 queuearray          queuearray
 progressfn          progressfn
 isatbottom          isatbottom
@@ -150,6 +150,7 @@ touchdpad           touchdpad
 shortcuts           shortcuts
 monospace           monospace
 extradimx           extradimx
+restored            restored
 profiles            profiles
 settings            settings
 calendar            calendar
@@ -165,6 +166,7 @@ thursday            thursday
 saturday            saturday
 language            language
 headerui            headerui
+qaleelah            qaleelah
 dialogui            dialogui
 closeall            closeall
 icondone            icondone
@@ -197,7 +199,6 @@ question            question
 sklamsah            sklamsah
 progress            progress
 duration            duration
-restored            restored
 iconmenu            iconmenu
 subtitle            subtitle
 toNative            toNative
@@ -246,6 +247,7 @@ hours12             hours12
 loading             loading
 exiting             exiting
 eqonaat             eqonaat
+taHjeem             taHjeem
 tahweem             tahweem
 keydown             keydown
 visible             visible
@@ -296,6 +298,8 @@ sunday              sunday
 monday              monday
 friday              friday
 dimmer              dimmer
+qaleel              qaleel
+wastah              wastah
 huboot              huboot
 scroll              scroll
 hidden              hidden
@@ -361,6 +365,7 @@ bottom              bottom
 spaces              spaces
 inline              inline
 player              player
+ayaat               ayaat
 build               build
 hijri               hijri
 theme               theme
@@ -439,10 +444,12 @@ form                form
 send                send
 i18n                i18n
 icon                icon
+aqil                aqil
+wast                wast
+tvfs                tvfs
 main                main
 exit                exit
 back                back
-tvfs                tvfs
 grid                grid
 name                name
 view                view
@@ -462,6 +469,7 @@ init                init
 text                text
 redl                redl
 redd                redd
+hawm                hawm
 ayah                ayah
 each                each
 _map                _map
