@@ -346,6 +346,23 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 		switch (args.XPO.name) {
 			case 'XPO.main':
 				webapp.header();
+				
+				softkeys.set(K.lf, function () {
+					main.prev();
+				});
+				softkeys.set(K.rt, function () {
+					main.next();
+				});
+				
+				softkeys.set(K.dn, function () {
+					if (webapp.isatbottom())
+						return main.nextayah();
+				}, 'd', 'XPO.iconkeyboardarrowdown');
+				softkeys.set(K.up, function () {
+					if (webapp.isatop())
+						return main.prevayah();
+				}, 'u', 'XPO.iconkeyboardarrowup');
+
 				softkeys.set(K.en, function () {
 					main.hifz(0, 1);
 					webapp.itlaa3(['XPO.bookmarked']);
@@ -367,22 +384,6 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 				softkeys.set(K.sl, function () {
 					Hooks.run('XPO.view', 'XPO.surahs');
 				}, 0, 'XPO.iconmenu');
-				
-				softkeys.set(K.lf, function () {
-					main.prev();
-				});
-				softkeys.set(K.rt, function () {
-					main.next();
-				});
-				
-				softkeys.set(K.up, function () {
-					if (webapp.isatop())
-						return main.prevayah();
-				});
-				softkeys.set(K.dn, function () {
-					if (webapp.isatbottom())
-						return main.nextayah();
-				});
 				break;
 		}
 	});

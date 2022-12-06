@@ -34,6 +34,8 @@ eqonaat
 	done
 	close
 	arrowback
+	keyboardarrowup
+	keyboardarrowdown
 	morevert
 	filedownload
 	bookmarkborder
