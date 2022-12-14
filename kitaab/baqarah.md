@@ -4,3 +4,6 @@
 Jibreel, Mikaeel
 
 # makaan
+# Hayyawaan
+# nabaat
+# asma allah
