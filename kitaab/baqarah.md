@@ -6,7 +6,7 @@ Jibreel, Mikaeel
 # makaan
 # Hayyawaan
 # nabaat
-# asma allah
+# asmaa allah
 # amr
 # taHreem
-# amthaal
+# amCaal
