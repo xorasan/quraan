@@ -7,3 +7,5 @@ Jibreel, Mikaeel
 # Hayyawaan
 # nabaat
 # asma allah
+# amr
+# taHreem
