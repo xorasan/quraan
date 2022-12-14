@@ -9,3 +9,4 @@ Jibreel, Mikaeel
 # asma allah
 # amr
 # taHreem
+# amthaal
