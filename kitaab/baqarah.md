@@ -24,7 +24,7 @@ jews dont want christians in politics & the opposite
 # target audience
 
 jews, christians and muslims who dont hate each other
-they respect that there's validity in eachothers' deen
+they respect that there's validity in each others' deen
 because they believe in the aaxirah & the unseen
 
 they're not competing in implementing their own version of laws
