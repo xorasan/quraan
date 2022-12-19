@@ -21,6 +21,8 @@ we're not talking about sufis or mystic christians
 
 jews dont want christians in politics & the opposite
 
+They are a large number, and the ones on top are very powerful. They want to take over the world, tkae over the government, take over the businesses.
+
 # target audience
 
 jews, christians and muslims who dont hate each other
