@@ -1,12 +1,16 @@
-Big Problems
-Housing
-Migration
-Debt, Money
-Environment
-Health, Physical & Mental. Drugs, Food.
-Misinformation
-Government
-Corporations
-War. Nuclear, Terrorism
-Society. Men, Women, LGBTQ, Family, Children, Elderly
-Class. Upper, Middle, Lower
+# Big Problems
+
+## economy
+Corporations, Debt, Money
+
+## environment
+housing, health, physical & mental. drugs, food.
+
+## war
+misinformation, government, migration, nuclear, terrorism
+
+## society
+men, women, LGBTQ, family, children, elderly
+
+## class
+upper, middle, lower
