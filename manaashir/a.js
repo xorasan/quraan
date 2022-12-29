@@ -267,9 +267,6 @@ return 'html, body {'
 +'\n		border:1px solid '+o.tertiary+';'
 +'\n	}'
 +'\n}'
-+'\n#softkeysui .left {'
-+'\n	border-left:1px solid '+o.secondaryd+';'
-+'\n}'
 +'\n@media (min-width:321px) {'
 +'\n	#softkeysui .row2 [data-hawm="1"] span {'
 +'\n		background:'+o.secondary+';'
@@ -1163,10 +1160,10 @@ setcss = function (obj, k, v) {
 		obj.style[k] = v;
 },
 popdata = function (obj, k, v) {
-	delete obj.dataset[k];
+	if (obj) delete obj.dataset[k];
 },
 setdata = function (obj, k, v) {
-	obj.dataset[k] = v;
+	if (obj) obj.dataset[k] = v;
 },
 getdata = function (obj, k) {
 	return obj.dataset[k];
@@ -1292,7 +1289,7 @@ var webapp, appname = 'quraan' || '',
 	focusprev, focusnext, navigables,
 	LAYERTOPMOST = 3000;
 ;(function(){
-	var doc = document, bod = doc.body;
+	var doc = document, bod = doc.body, wakelockstatus;
 	navigables = ['input', 'textarea', 'button', 'a', 'select'];
 	/* FOCUS how this works
 	* for elements inside other formating elements, set data-focus on each parent
@@ -1531,6 +1528,18 @@ var webapp, appname = 'quraan' || '',
 				sheet.header(text);
 			}
 			translate.update();
+		},
+		sahhar: function (what) { // keep awake wakelock
+			if (navigator && navigator.requestWakeLock) {
+				webapp.nawwam();
+				wakelockstatus = navigator.requestWakeLock(what||'screen');
+			}
+		},
+		nawwam: function () { // let sleep, put to sleep, clear wakelock
+			if (wakelockstatus && wakelockstatus.unlock) {
+				try { wakelockstatus.unlock(); } catch (e) { $.log( e ); }
+				wakelockstatus = 0;
+			}
 		},
 		scrollx: function (v) {
 			var se = scrollingelement();
@@ -2580,6 +2589,10 @@ var bahaclist, bahac;
 		}
 	});
 })();
+/* @TODO
+* add .tasdeeq, which adds having to press back/esc twice to exit with taxeer
+* also make the exit button red when in taxeer
+* */
 var backstack;
 ;(function(){
 	var s,
@@ -2606,7 +2619,7 @@ var backstack;
 		active && active.focus && active.focus();
 	};
 	/*
-	* this is the glatteis standalone platform
+	* this is the mudeer standalone platform
 	* there's no browser history stack or back+forward buttons to worry about
 	* so we can take full control
 	* no need to make it compatible with almudeer since that's for PWAs
@@ -2793,21 +2806,21 @@ var preferences;
 		},
 	};
 	var buildnum = preferences.get('#', 1);
-	if ( buildnum != 162 ) {
+	if ( buildnum != 163 ) {
 		preferences.pop(3); // ruid
 		preferences.pop('@'); // last sync time
 		preferences.pop(4); // list view cache
 		preferences.pop(6); // initial sync done
 	}
-	preferences.set('#', 162);
+	preferences.set('#', 163);
 	Hooks.set('ready', function () {
-		if ( buildnum != 162 ) {
+		if ( buildnum != 163 ) {
 			$.taxeer('seeghahjadeedah', function () {
 				Hooks.run('seeghahjadeedah', buildnum);
 			}, 2000);
 		}
 	});
-	$.log.s( 162 );
+	$.log.s( 163 );
 })();
 var activity;
 ;(function(){
@@ -3296,10 +3309,10 @@ var settings, currentad;
 			});
 		}],*/
 		['reportbug', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' bug '+162);
+			activity.abrad(myemail+'?subject='+appname+' bug '+163);
 		}],
 		['requestfeat', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' request '+162);
+			activity.abrad(myemail+'?subject='+appname+' request '+163);
 		}],
 		['timeformat', function () {
 			var is24 = preferences.get(24, 1);
@@ -4779,11 +4792,12 @@ var dialog;
 	var lamsahbarimtahan = function () {
 	};
 	listener(skhints, ['touchstart'/*, 'mousedown'*/], function (e) {
-		lamsahbar = [e.touches[0].pageX, e.touches[0].pageY];
+		preventdefault(e);
+		lamsahbar = [e.touches[0].pageX, e.touches[0].pageY-scrollingelement().scrollTop];
 	});
 	listener(skhints, ['touchmove'/*, 'mousemove'*/], function (e) {
 		if (lamsahbar) {
-			lamsahbar = [e.touches[0].pageX, e.touches[0].pageY];
+			lamsahbar = [e.touches[0].pageX, e.touches[0].pageY-scrollingelement().scrollTop];
 			var ch = skhints.children, el,
 				path;
 			if (e.type == 'touchmove') {
@@ -4808,22 +4822,23 @@ var dialog;
 		}
 	});
 	listener(skhints, ['touchend', 'touchcancel'/*, 'mouseup', 'mouseleave'*/], function (e) {
-		var ch = skhints.children, path, el;
+		var ch = skhints.children, path;
 		if (e.type == 'touchend' && lamsahbar) {
 			path = raycast(lamsahbar[0], lamsahbar[1]);
 		}
 		for (var i in ch) {
 			if ( ch.hasOwnProperty(i) ) {
 				for (j in path) {
-					if (path[j] == ch[i]) el = ch[i];
+					if (path[j] == ch[i]) {
+						if (ch[i] && e.type == 'touchend') {
+							ch[i].click();
+						}
+					}
 				}
 			}
 		}
 		for (var i in ch) {
 			if ( ch.hasOwnProperty(i) ) {
-				if ( ch[i] == el && e.type == 'touchend' && getdata(ch[i], 'hawm') ) {
-					ch[i].click();
-				}
 				popdata(ch[i], 'hawm');
 			}
 		}

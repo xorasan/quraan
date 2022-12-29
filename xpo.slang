@@ -283,6 +283,7 @@ mowdoo3               mowdoo3
 ba3dihi               ba3dihi
 kitabat               kitabat
 darajah               darajah
+tasdeeq               tasdeeq
 ittasal               ittasal
 mfateeh               mfateeh
 safhaat               safhaat
@@ -333,6 +334,8 @@ saabiq                saabiq
 qaadim                qaadim
 onnext                onnext
 unhook                unhook
+sahhar                sahhar
+nawwam                nawwam
 select                select
 popall                popall
 before                before
