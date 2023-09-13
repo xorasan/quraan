@@ -35,6 +35,18 @@ big, .big {
 	font-size:160%;
 }
 	
+.bigger {
+	font-size:220%;
+}
+	
+.biggest {
+	font-size:300%;
+}
+	
+.huge {
+	font-size:400%;
+}
+	
 html, body {
 	font-size:100%;
 	padding:0 0 20px 0;
@@ -115,16 +127,19 @@ label {
 	padding:0 2px;
 }
 	
+input, textarea, select, .input {
+	border:0;
+	padding:1px 2px;
+}
+	
 input, textarea, select {
 	background-color:transparent;
-	border:0;
 	border-radius:0;
 	font-family:inherit;
 	font-size:inherit;
 	font-weight:inherit;
 	width:100%;
 	margin:0;
-	padding:1px 2px;
 	display:block;
 	resize:none;
 }
@@ -170,6 +185,7 @@ select, select:focus {
 	width:76px;
 	height:76px;
 	border:0;
+	margin:8px;
 }
 	
 #loadingbox {
@@ -183,6 +199,26 @@ select, select:focus {
 }
 	
 .above {
+	z-index:100;
+}
+	
+.z500 {
+	z-index:500;
+}
+	
+.z400 {
+	z-index:400;
+}
+	
+.z300 {
+	z-index:300;
+}
+	
+.z200 {
+	z-index:200;
+}
+	
+.z100 {
 	z-index:100;
 }
 	
@@ -316,6 +352,10 @@ select, select:focus {
 	vertical-align:middle;
 }
 	
+.displayblock {
+	display:block;
+}
+	
 .narrowline {
 	line-height:1;
 }
@@ -326,6 +366,14 @@ select, select:focus {
 	
 .narrowerletters {
 	letter-spacing:-1.5px;
+}
+	
+.light {
+	font-weight:100;
+}
+	
+.semibold {
+	font-weight:600;
 }
 	
 .bold {
@@ -573,7 +621,6 @@ input.bare {
 	max-width:160px;
 	padding:10px 15px;
 	border-radius:20px;
-	font-weight:bold;
 }
 	
 #taht3nsar .text {
@@ -587,6 +634,57 @@ input.bare {
 	
 html, body, svg text {
 	font-family:Segoe UI, Noto Naskh Arabic UI, sans-serif;
+}
+	
+@media (min-width:320px) {
+	#softkeysui .left {
+		display:flex !important;
+		flex-direction:row-reverse;
+		align-items:center;
+	}
+	#softkeysui .right {
+		display:flex !important;
+		flex-direction:row;
+		align-items:center;
+	}
+	#softkeysui .row2 button:hover .tooltip, #softkeysui[data-shown] .row2 button .tooltip {
+		display:flex;
+	}
+	#softkeysui[data-shown] .row2 button .tooltip label {
+		display:none;
+	}
+	#softkeysui .row2 button:hover .tooltip label {
+		display:flex;
+	}
+	#softkeysui .row2 button .tooltip {
+		display:none;
+	}
+	#softkeysui[data-shown] .row2 button .tooltip {
+		font-size:80%;
+	}
+	#softkeysui .row2 button .tooltip {
+		position:absolute;
+		right:70px;
+		align-items:center;
+		top:0;
+		font-weight:normal;
+		font-size:100%;
+		width:max-content;
+		padding:8px;
+		border-radius:8px;
+	}
+	#softkeysui button .key {
+		margin:2px;
+		padding:2px;
+	}
+	#softkeysui button label {
+		border:0 !important;
+		height:auto;
+	}
+	#softkeysui .row1 button .tooltip {
+		font-size:90%;
+		flex-direction:column;
+	}
 }
 	
 @media (min-width:640px) {
@@ -605,6 +703,9 @@ html, body, svg text {
 }
 	
 @media (min-width:800px) {
+	body {
+		max-width:700px;
+	}
 	#itlaa3 .text {
 		font-size:150%;
 	}
@@ -621,6 +722,9 @@ html, body, svg text {
 	#softkeysui .row2 button {
 		height:54px;
 	}
+	#softkeysui .row2 button .tooltip {
+		right:90px;
+	}
 	#softkeysui .row2 button svg {
 		height:48px;
 		width:48px;
@@ -634,23 +738,11 @@ html, body, svg text {
 }
 	
 @media (min-width:1024px) {
+	body {
+		max-width:840px;
+	}
 	#eqonahui {
 		display:inline-block;
-	}
-	body {
-		max-width:600px;
-		margin:0 90px 0 auto !important;
-	}
-	#pagermowjoodah {
-		max-width:600px;
-	}
-	[data-fullscreen] {
-		position:fixed;
-		top:0;
-		left:0;
-		width:calc(100vw - 700px) !important;
-		bottom:0;
-		overflow:auto;
 	}
 	#skenter {
 		width:96px;
@@ -912,6 +1004,12 @@ html, body, svg text {
 	display:inline-block;
 }
 	
+[data-animations] #softkeysui button .icon {
+	position:relative;
+	transition:.2s right ease-out;
+	right:0;
+}
+	
 #softkeysui button svg {
 	height:25px;
 	width:25px;
@@ -1043,7 +1141,6 @@ html, body, svg text {
 	}
 	#softkeysui .row1 button {
 		height:64px;
-		background:transparent !important;
 	}
 	#softkeysui button:active, #softkeysui button[data-lamsah] {
 	}
@@ -1053,7 +1150,7 @@ html, body, svg text {
 	}
 	#softkeysui .row2, #skdots {
 		display:flex;
-		flex-direction:column-reverse;
+		flex-direction:column;
 		position:fixed;
 		bottom:90px;
 		right:0;
@@ -1109,13 +1206,14 @@ html, body, svg text {
 		padding:0 4px;
 		position:relative;
 		overflow:visible;
+		border-radius:10px 0 0 10px;
 	}
 	#softkeysui .row2 [data-hawm="1"] .icon {
 		right:45px;
 		position:relative;
 	}
 	#softkeysui[data-hidden] .row2 {
-		right:-16px;
+		right:-6px;
 		border-color:transparent;
 	}
 }
@@ -1291,7 +1389,7 @@ html, body, svg text {
 					<div class=grow>
 						<b data-i18n=build></b>
 						
-						<div> 163</div>
+						<div> 176</div>
 						</div>
 					
 					<div class=grow>
@@ -1325,7 +1423,11 @@ html, body, svg text {
 			<button data-template=skbutton>
 				<div class=icon data-id=icon></div>
 				
-				<label hidden data-id=name></label>
+				<span class="flex tooltip">
+					<label hidden data-id=name></label>
+					
+					<div class="key pad tag dim" hidden data-id=key></div>
+					</span>
 				
 				<span hidden data-id=label></span>
 				</button>

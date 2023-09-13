@@ -268,11 +268,38 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 		}
 	});
 	Hooks.set('XPO.bahac', function (rawstring) {
-		var string = nazzaf(rawstring).trim();
-		// TODO
-//		if (string.match(/[0-9\:]*/i))
-		if (string.length) {
-			var results = [], count = 0, surahcount = 0;
+		var string = nazzaf(rawstring).trim(), results = [];
+		// TODO search by numbers Chapter:Ayah
+		if ( string.match(/[0-9\:\ ]+/i) ) {
+			var splat = string.split(':');
+			splat = splat.map(function (e) {
+				return parseint( e.trim() );
+			});
+			var surah = splat[0], ayah = splat[1]-1;
+
+			var metadata = meta.surahs[surah];
+			if (metadata && cached[surah]) {
+				results.push({
+					id: surah,
+					XPO.surah: parseInt(surah),
+					XPO.ayah: 0,
+					XPO.title: surah + ' ' + metadata[4],
+					XPO.body: metadata[6],
+				});
+				var ayahtext = cached[surah][ayah];
+				if (ayahtext) {
+					results.push({
+						XPO.titlehide: hawalah(surah, ayah),
+						XPO.surah: parseInt(surah),
+						XPO.ayah: parseInt(ayah),
+						id: surah+':'+ayah,
+						XPO.bodyshowhtml: ayahtext,
+					});
+				}
+			}
+		}
+		if ( string.length ) {
+			var count = 0, surahcount = 0;
 			for (var i = 1; i <= 114 && surahcount < 3; ++i) {
 				var metadata = meta.surahs[i];
 				if (nazzaf(metadata[4]).includes(string)
@@ -309,6 +336,7 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 				if (results.length >= 20) break;
 			}
 		}
+
 		bahac.fahras(results);
 	});
 	Hooks.set('XPO.scroll', function (top) {

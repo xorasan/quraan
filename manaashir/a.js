@@ -4,10 +4,10 @@ return 'html, body {'
 +'\n	color:'+o.text+';'
 +'\n}'
 +'\nbody {'
-+'\n	background:'+o.primary+';'
++'\n	background-color:'+o.primary+';'
 +'\n}'
 +'\nbody[data-transparency] {'
-+'\n	background:'+o.primaryt+';'
++'\n	background-color:'+o.primaryt+';'
 +'\n}'
 +'\nhr {'
 +'\n	border-top:2px dashed '+o.secondary+';'
@@ -50,15 +50,15 @@ return 'html, body {'
 +'\nbutton[data-selected] svg {'
 +'\n	fill:'+o.primary+' !important;'
 +'\n}'
-+'\ninput, textarea, select {'
++'\ninput, textarea, select, .input {'
 +'\n	border-bottom:2px solid '+o.secondary+';'
 +'\n	color:'+o.textd+';'
 +'\n}'
-+'\ninput:active, input:focus {'
++'\ninput:active, input:focus, .input:active, .input:focus {'
 +'\n	color:'+o.textl+';'
 +'\n	border-color:'+o.accent+';'
 +'\n}'
-+'\ninput[data-error] {'
++'\ninput[data-error], .input[data-error] {'
 +'\n	border-color:'+o.red+';'
 +'\n}'
 +'\nselect {'
@@ -127,6 +127,15 @@ return 'html, body {'
 +'\n	background:'+o.primaryt+';'
 +'\n	border-color:'+o.secondaryt+';'
 +'\n}'
++'\n@media (min-width:320px) {'
++'\n	#softkeysui .row2 button .tooltip {'
++'\n		border:1px solid '+o.secondaryd+';'
++'\n		background:'+o.primaryl+';'
++'\n	}'
++'\n	#softkeysui button .key {'
++'\n		background:'+o.secondaryd+';'
++'\n	}'
++'\n}'
 +'\n@media (min-width:640px) {'
 +'\n	::-webkit-scrollbar {'
 +'\n		background:'+o.primary+';'
@@ -157,7 +166,7 @@ return 'html, body {'
 +'\n	border-color:'+o.textxd+';'
 +'\n}'
 +'\n[data-rakkaz].list .item[data-selected], [data-rakkaz].list .listitem[data-selected] {'
-+'\n	background:linear-gradient(45deg, '+o.secondary+' -110%, '+o.tertiary+' 220%);'
++'\n	background:linear-gradient(45deg, '+o.primaryl+' -110%, '+o.secondaryd+' 220%);'
 +'\n	border-color:'+o.accent+';'
 +'\n}'
 +'\n[dir=rtl] .list .item[data-selected], [dir=rtl] .list .listitem[data-selected] {'
@@ -218,8 +227,20 @@ return 'html, body {'
 +'\n#softkeysui .row1 button {'
 +'\n	border-top:1px solid '+o.secondaryd+';'
 +'\n}'
++'\n#softkeysui .row1 button:hover {'
++'\n	box-shadow:0 0 25px 2px '+o.secondary+';'
++'\n}'
++'\n#softkeysui .row1 button:focus {'
++'\n	box-shadow:0 0 25px 2px '+o.accentd+';'
++'\n}'
 +'\n#softkeysui .row2 button {'
 +'\n	border-right:1px solid '+o.secondaryd+';'
++'\n}'
++'\n#softkeysui .row2 button:hover {'
++'\n	box-shadow:-20px 0 15px 0px '+o.secondary+' inset;'
++'\n}'
++'\n#softkeysui .row2 button:focus {'
++'\n	box-shadow:-20px 0 15px 0px '+o.accentd+' inset;'
 +'\n}'
 +'\n#softkeysui .left {'
 +'\n	border-right:1px solid '+o.secondaryd+';'
@@ -254,6 +275,9 @@ return 'html, body {'
 +'\n	#softkeysui button {'
 +'\n		background:'+o.primary+';'
 +'\n		color:'+o.textl+';'
++'\n	}'
++'\n	#softkeysui .row1 button {'
++'\n		background:'+o.primaryt+';'
 +'\n	}'
 +'\n	#softkeysui button:active, #softkeysui button[data-lamsah] {'
 +'\n		background:'+o.secondary+';'
@@ -1022,6 +1046,12 @@ var Hooks, hooks;
 	hooks = Hooks;
 })();
 var
+stringify = function (o) {
+	return JSON.stringify(o);
+},
+parsejson = function (o) {
+	return JSON.parse(o);
+},
 mubaaraat = function (str, re) {
 	return (str.match(re)||[])[0];
 },
@@ -1118,8 +1148,23 @@ intify = function (arr) {
 },
 tolower = function (obj) {
 	return obj.toLowerCase();
+},
+toupper = function (obj) {
+	return obj.toUpperCase();
 };
 var
+select_content = function (e) {
+	if (e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement) {
+		if (isfun(e.select))
+			e.select();
+	} else {
+		var range = document.createRange();
+		range.selectNodeContents(e);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	}
+},
 enc = function (v) {
 	return encodeURIComponent(v);
 },
@@ -1221,6 +1266,15 @@ createelement = function (name, classes, id) {
 	if (id) e.id = id;
 	return e;
 },
+tahmeel = function (filename, text, mimetype) { // download file with a name
+	var e = createelement('a');
+	attribute(e, 'href', (mimetype||'data:text/plain;charset=utf-8,') + encodeURIComponent(text));
+	attribute(e, 'download', filename);
+	setcss(e, 'display', 'none');
+	document.body.appendChild(e);
+	e.click();
+	document.body.removeChild(e);
+},
 iswithinelement = function (arr, element) {
 	var a = arr[0],
 		b = arr[1],
@@ -1286,11 +1340,24 @@ var webapp, appname = 'quraan' || '',
 	checkbox = checkbox || 0,
 	preferences = preferences || 0,
 	translate = translate || 0,
-	focusprev, focusnext, navigables,
+	rakkazawwal, focus_first_element, focusprev, focusnext, navigables, is_navigable,
 	LAYERTOPMOST = 3000;
 ;(function(){
-	var doc = document, bod = doc.body, wakelockstatus;
+	var doc = document, bod = doc.body, wakelockstatus, isalbixraaj;
 	navigables = ['input', 'textarea', 'button', 'a', 'select'];
+	is_navigable = function (e) {
+		return navigables.includes(e.tagName.toLowerCase()) || e.contentEditable == 'true';
+	};
+	focus_first_element = rakkazawwal = function (e, scroll) {
+		if (e) {
+			var s = e.querySelector('input, textarea, button, a, select, [contenteditable]');
+			if (s) {
+				s.focus();
+				if (scroll) webapp.scrollto(s);
+				return s;
+			}
+		}
+	};
 	/* FOCUS how this works
 	* for elements inside other formating elements, set data-focus on each parent
 	* this hints to this algo to go up a parent
@@ -1316,9 +1383,8 @@ var webapp, appname = 'quraan' || '',
 				out = focusprev(element.lastElementChild, 1, ++num);
 				break;
 			}
-			else if ( navigables.includes( element.tagName.toLowerCase() ) ) {
+			else if ( is_navigable( element ) ) {
 				element.focus();
-				webapp.scrollto(element);
 				out = element;
 				break;
 			}
@@ -1335,7 +1401,9 @@ var webapp, appname = 'quraan' || '',
 			* come up with a solution for this
 			* */
 		}
-		element.onprev && element.onprev(element);
+		if (markooz() === element) {
+			element.onprev && element.onprev(element);
+		}
 		if (out) {
 			if (orig && orig.listobject) {
 				orig.listobject.deselect();
@@ -1364,9 +1432,8 @@ var webapp, appname = 'quraan' || '',
 				out = focusnext(element.firstElementChild, 1, ++num);
 				break;
 			}
-			else if ( navigables.includes( element.tagName.toLowerCase() ) ) {
+			else if ( is_navigable( element ) ) {
 				element.focus();
-				webapp.scrollto(element);
 				out = element;
 				break;
 			}
@@ -1379,7 +1446,13 @@ var webapp, appname = 'quraan' || '',
 		else if ( element.parentElement.dataset.focus ) {
 			return focusnext( element.parentElement, 0, ++num );
 		}
-		element.onnext && element.onnext(element);
+		/* BUG CASE
+		* changed this to orig because i wasn't able to override this inside
+		* a listitem with an input element, on pressing down it kept replacing
+		* element with the nextsibling (see above while loop) :(
+		* more testing needed
+		* */
+		orig.onnext && orig.onnext(orig);
 		if (out) {
 			if (orig && orig.listobject) {
 				orig.listobject.deselect();
@@ -1588,8 +1661,14 @@ var webapp, appname = 'quraan' || '',
 				delete document.body.dataset.largetext;
 			}
 		},
+		bixraaj: function (isal) { // on exit, ask or no
+			if (isal) isalbixraaj = 1;
+			else isalbixraaj = 0;
+		},
 		exit: function () {
-			close();
+			if (isalbixraaj) {
+				if ( confirm(xlate('sure')) ) close();
+			} else close();
 		},
 		icons: function () {
 			var elements = document.body.querySelectorAll('[data-icon]');
@@ -1602,7 +1681,7 @@ var webapp, appname = 'quraan' || '',
 			}
 		},
 		uponresize: function () {
-			$.taxeer('taHjeem', function () {
+			$.taxeer('webappresize', function () {
 				if (innerwidth() <= 320) {
 					setdata(bod, 'aqil', 1);
 				} else {
@@ -1628,24 +1707,38 @@ var webapp, appname = 'quraan' || '',
 				} else {
 					popdata(bod, 'wastah');
 				}
-				if (innerwidth() >= 1024) {
-					setdata(bod, 'tvfs', 1);
-				} else {
-					popdata(bod, 'tvfs');
-				}
 			}, 100);
 			if (innerheight() <= 480) document.body.dataset.keyboardopen = 1;
 			else delete document.body.dataset.keyboardopen;
 		},
 	};
+	webapp.itlaa3 = function (text, time) {
+		var element = itlaa3.firstElementChild;
+		if (text) {
+			if (text instanceof Array) {
+				element.dataset.i18n = text[0];
+				translate.update(itlaa3);
+			} else {
+				delete element.dataset.i18n,
+				element.innerText = text;
+			}
+			itlaa3.hidden = 0;
+			$.taxeer('itlaa3', function () {
+				webapp.itlaa3();
+			}, time||3000);
+		} else {
+			delete element.dataset.i18n,
+			element.innerText = '',
+			itlaa3.hidden = 1;
+		}
+	};
+	webapp.status = webapp.itlaa3;
 	listener('dragover', function (e) {
-		$.log('dragover');
 		setdata(bod, 'tahweem', 1);
 		preventdefault(e);
 		return false;
 	});
 	listener('dragleave', function (e) {
-		$.log('dragleave');
 		$.taxeer('dragleave', function () {
 			popdata(bod, 'tahweem');
 		}, 3000);
@@ -1656,7 +1749,10 @@ var webapp, appname = 'quraan' || '',
 		popdata(bod, 'tahweem');
 		preventdefault(e);
 		var f = e.dataTransfer.files;
-		if (f && f.length) Hooks.run('huboot', f);
+		if (f && f.length) {
+			Hooks.run('huboot', f);
+		}
+		Hooks.run('dropped', e.dataTransfer);
 		return false;
 	});
 	listener('resize', function () {
@@ -1723,26 +1819,6 @@ var scrollingelement = function () {
 };
 var datepicker = datepicker || 0;
 ;(function(){
-	webapp.itlaa3 = function (text, time) {
-		var element = itlaa3.firstElementChild;
-		if (text) {
-			if (text instanceof Array) {
-				element.dataset.i18n = text[0];
-				translate.update(itlaa3);
-			} else {
-				delete element.dataset.i18n,
-				element.innerText = text;
-			}
-			itlaa3.hidden = 0;
-			$.taxeer('itlaa3', function () {
-				webapp.itlaa3();
-			}, time||3000);
-		} else {
-			delete element.dataset.i18n,
-			element.innerText = '',
-			itlaa3.hidden = 1;
-		}
-	};
 	webapp.taht3nsar = function (text, time, taht) { // below element
 		taht = document.activeElement || taht;
 		var element = taht3nsar.firstElementChild;
@@ -1796,7 +1872,7 @@ var datepicker = datepicker || 0;
 		var se = scrollingelement();
 		return Math.floor(se.scrollTop) === se.scrollHeight - se.clientHeight;
 	};
-	Hooks.set('closeall', function (darajah) {
+	hooks.set('closeall', function (darajah) {
 		if (darajah === 3) {
 			datepicker && datepicker.hide();
 			dialog.hide();
@@ -1810,13 +1886,13 @@ var datepicker = datepicker || 0;
 				webapp.exit();
 			});
 	});
-	Hooks.set('restore', function (darajah) {
+	hooks.set('restore', function (darajah) {
 		if (darajah === 3) webapp.dimmer(600);
 		if (darajah === 2) webapp.dimmer(400);
 		if (darajah === 1) webapp.dimmer();
 		if (darajah === 0) webapp.header(), webapp.dimmer();
 	});
-	Hooks.set('backstackdialog', function (args) {
+	hooks.set('backstackdialog', function (args) {
 		var date = 0;
 		if (datepicker && args instanceof HTMLElement) date = 1;
 		webapp.dimmer(600);
@@ -1832,7 +1908,7 @@ var datepicker = datepicker || 0;
 		if (date) datepicker.show(args);
 		else dialog.show(args);
 	});
-	Hooks.set('backstacksheet', function (args) {
+	hooks.set('backstacksheet', function (args) {
 		webapp.dimmer(400);
 		softkeys.clear();
 		if (args.callback || args.c) {
@@ -1846,23 +1922,23 @@ var datepicker = datepicker || 0;
 		sheet.show(args);
 		softkeys.showhints();
 	});
-	Hooks.set('backstackview', function (name) {
+	hooks.set('backstackview', function (name) {
 		webapp.dimmer();
 		softkeys.clear();
 		softkeys.P.empty();
 		softkeys.set(K.sr, function () {
-			Hooks.run('back');
+			hooks.run('back');
 		}, 0, 'iconarrowback');
 		view.ishtaghal(name);
 		softkeys.showhints();
 		return 1; // stop propagation
 	});
-	Hooks.set('backstackmain', function (name) {
+	hooks.set('backstackmain', function (name) {
 		softkeys.clear();
 		softkeys.P.empty();
 		view.ishtaghal('main');
 	});
-	Hooks.set('ready', function () {
+	hooks.set('ready', function () {
 		settings.adaaf('animations', function () {
 			var animationsoff = preferences.get(15, 1);
 			if (animationsoff) {
@@ -1924,9 +2000,7 @@ var datepicker = datepicker || 0;
 var list;
 ;(function(){
 	'use strict';
-	var direction = function () {
-		return document.body.dir;
-	};
+	var direction = function () { return document.body.dir; };
 	var proto = {
 		_muntahaabox: 0,
 		_muntahaa: -1,
@@ -1934,7 +2008,7 @@ var list;
 		adapter: 0,
 		/* EXPLAIN TODO
 		* my hunch is that this is to change idb prop names to dom prop names
-		* but im not sure
+		* but im not sure, prolly also used to remap prop names
 		* */
 		beforeset: 0,
 		beforepop: 0,
@@ -1950,7 +2024,15 @@ var list;
 		},
 		uponend: 0, // when reached list end, do what? return 1 to avoid default
 		uponstart: 0,
+		bintixaab: 0, // upon selection change [TODO deprecate this]
+		uponintaxab: 0, // same as bintixaab [TODO deprecate this]
+		on_selection: 0, // 2023 NEW
 		uponnavi: 0, // ( type )
+		_scroll_on_focus: 1,
+		scroll_on_focus: function (yes) {
+			this._scroll_on_focus = yes;
+			return this;
+		},
 		moveup: function (uid) {
 			uid = uid || (this.axavmuntaxab()||{}).uid;
 			var clone = this.get( this.id2num(uid) );
@@ -2084,6 +2166,7 @@ var list;
 				if (this.uponpaststart)
 					yes = this.uponpaststart(this.selectedold);
 				if (yes) {
+					this.selected = 0;
 					this.intaxabscroll( this.intaxabsaamitan() );
 				}
 				else this.last();
@@ -2115,6 +2198,7 @@ var list;
 				if (this.uponpastend)
 					yes = this.uponpastend(this.selectedold);
 				if (yes) {
+					this.selected = this.length()-1;
 					this.intaxabscroll( this.intaxabsaamitan() );
 				}
 				else this.first(this.gridnum ? this.selected - this.length()-1: -1);
@@ -2159,8 +2243,7 @@ var list;
 			}
 			return item;
 		},
-		/*
-		* id can be a number or string id
+		/* id can be a number or string id
 		* */
 		select: function (id, noscroll, silent, nofocus) {
 			id = id === undefined ? this.selected: id;
@@ -2181,7 +2264,8 @@ var list;
 			}
 			return this;
 		},
-		intaxabscroll: function (selected) {
+		intaxabscroll: function (selected) { // select_scroll TODO rename
+			if (!this._scroll_on_focus) return;
 			if (isundef(selected)) {
 				selected = this.get( this.selected );
 			}
@@ -2204,9 +2288,9 @@ var list;
 						delete item.dataset.selected;
 				}
 			}
-			if (isfun(this.uponintaxab) && selected) {
+			if (isfun(this.on_selection) && selected) {
 				var a = this.adapter.get( selected.dataset.uid );
-				if (a) this.uponintaxab(a);
+				if (a) this.on_selection(a);
 			}
 			return selected;
 		},
@@ -2235,6 +2319,10 @@ var list;
 			}
 		},
 		set: function (o, id) { // deprecate the second argument
+			/* IMPORTANT
+			* id would actually change the html#id
+			* so avoid it unless you know what you're doing
+			* */
 			if (id) $.log('list.set, stop using id, use o.uid instead');
 			o = o || {};
 			var clone, LV = this, listitem = o._listitem || LV._listitem,
@@ -2242,7 +2330,13 @@ var list;
 			if (isnum(LV._muntahaa) && LV._muntahaa > -1 && LV.length() >= LV._muntahaa)
 				return; // muntahaa limit hit
 			if (id === undefined)
-				if (o.uid === undefined) o.uid = id = LV.length();
+				if (o.uid === undefined) {
+					var newuid = LV.length();
+					LV.adapter.each(function (c, e) {
+						if (newuid <= c.uid) newuid = c.uid+1;
+					});
+					o.uid = id = newuid;
+				}
 				else id = o.uid;
 			if (LV.idprefix_raw && o.uid !== undefined)
 				o.id_dom = LV.idprefix_raw + o.uid;
@@ -2299,25 +2393,32 @@ var list;
 			}
 			LV._katabmowdoo3();
 			LV.afterset && LV.afterset( o, clone, templates.keys(clone) ); // TODO deprecate
-			LV.ba3dihi && LV.ba3dihi( o, clone, templates.keys(clone) );
+			LV.ba3dihi && LV.ba3dihi( o, clone, templates.keys(clone) ); // TODO deprecate
+			LV.after_set && LV.after_set( o, clone, templates.keys(clone) );
 			LV.uponadaaf && LV.uponadaaf( LV.length() );
 			return clone;
 		},
-		listitem: function (elementname) {
-			this._listitem = elementname || 'listitem';
+		namoovaj: function (eansarism) {
+			this._listitem = eansarism || 'listitem';
 			return this;
 		},
-		axavmfateeh: function (uid) {
+		listitem: function (elementname) { // namoovaj alternative
+			return this.namoovaj(elementname);
+		},
+		axavmfateeh: function (uid) { // TODO deprecate
 			var clone = this.get( this.id2num(uid) );
 			if (clone) {
 				return templates.mfateeh(clone);
 			}
 		},
-		axavmuntaxab: function () { // get baidaa item's adapter object
-			return this.axadmuntaxab();
+		get_item_keys: function (uid) { // NEW
+			return this.axavmfateeh(uid);
 		},
-		axadmuntaxab: function () {
-			var uid = this.num2id( this.selected || 0 );
+		axavmuntaxab: function (uid) { // get [selected] item's adapter object
+			return this.axadmuntaxab(uid);
+		},
+		axadmuntaxab: function (uid) {
+			uid = this.num2id( uid || this.selected || 0 );
 			if (!isundef(uid)) {
 				return this.adapter.get( uid );
 			}
@@ -2341,6 +2442,9 @@ var list;
 				return this.adapter.get( baidaa );
 			}
 			return false;
+		},
+		get_item_element: function (uid) {
+			return this.get( isundef(uid) ? this.selected: uid );
 		},
 		get: function (id) {
 			return this.keys.items.children[id];
@@ -2403,6 +2507,10 @@ var list;
 			this.gridnum = num;
 			if (num) this.element.dataset.grid = num;
 			else delete this.element.dataset.grid;
+			return this;
+		},
+		zumrah: function (zumraat) {
+			this.element.className = 'list '+zumraat;
 			return this;
 		},
 		freeflow: function (v) {
@@ -2536,7 +2644,7 @@ var bahaclist, bahac;
 			if (backstack.states.view === 'bahac') {
 				webapp.header( results.length ? (results.length+' '+translate('results'))
 								: translate('search') );
-				bahaclist.select();
+				bahaclist.intaxabsaamitan();
 			}
 			oldresults = results;
 		},
@@ -2572,13 +2680,10 @@ var bahaclist, bahac;
 					keys.searchbox.focus();
 				bahac.fahras();
 				softkeys.list.basic(bahaclist);
-				softkeys.set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], function (k) {
-					bahaclist.press(k);
-				});
 				if (kitabat)
 					softkeys.set(K.sl, function () {
 						bahaclist.press(K.sl);
-					}, 0, 'iconedit');
+					}, '0', 'iconedit');
 				softkeys.set('*', function () {
 					bahaclist.selected = -1;
 					bahaclist.select();
@@ -2806,21 +2911,21 @@ var preferences;
 		},
 	};
 	var buildnum = preferences.get('#', 1);
-	if ( buildnum != 163 ) {
+	if ( buildnum != 176 ) {
 		preferences.pop(3); // ruid
 		preferences.pop('@'); // last sync time
 		preferences.pop(4); // list view cache
 		preferences.pop(6); // initial sync done
 	}
-	preferences.set('#', 163);
+	preferences.set('#', 176);
 	Hooks.set('ready', function () {
-		if ( buildnum != 163 ) {
+		if ( buildnum != 176 ) {
 			$.taxeer('seeghahjadeedah', function () {
 				Hooks.run('seeghahjadeedah', buildnum);
 			}, 2000);
 		}
 	});
-	$.log.s( 163 );
+	$.log.s( 176 );
 })();
 var activity;
 ;(function(){
@@ -2854,6 +2959,9 @@ var view;
 	view = {
 		zaahir: function (name) {
 			return view.axav() === name;
+		},
+		is_active: function (name) {
+			return this.zaahir(name);
 		},
 		mfateeh: function (name) { // keys
 			var element = index[name];
@@ -2907,6 +3015,7 @@ var view;
 			return index;
 		},
 	};
+	view.dom_keys = view.mfateeh;
 })();
 var time;
 ;(function(){
@@ -3309,10 +3418,10 @@ var settings, currentad;
 			});
 		}],*/
 		['reportbug', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' bug '+163);
+			activity.abrad(myemail+'?subject='+appname+' bug '+176);
 		}],
 		['requestfeat', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' request '+163);
+			activity.abrad(myemail+'?subject='+appname+' request '+176);
 		}],
 		['timeformat', function () {
 			var is24 = preferences.get(24, 1);
@@ -3411,12 +3520,21 @@ var settings, currentad;
 	Hooks.set('viewready', function (args) {
 		switch (args.name) {
 			case 'main':
-				softkeys.set('9', function () {
-					Hooks.run('view', 'settings');
-				}, '9', 'iconsettings');
+				softkeys.add({ n: 'Settings',
+					k: '9',
+					i: 'iconsettings',
+					c: function () {
+						Hooks.run('view', 'settings');
+					}
+				});
 				break;
 			case 'settings':
-				webapp.header( ['settings'] );
+				if (pager) {
+					pager.intaxab('settings', 1);
+					webapp.header();
+				} else { // since pager already shows context
+					webapp.header( ['settings'] );
+				}
 				softkeys.list.basic(settingslist);
 				softkeys.set(K.en, function () {
 					settingslist.press(K.en);
@@ -3598,7 +3716,11 @@ var translate, taraajim = taraajim || {}, xlate;
 	});
 	xlate = translate;
 })();
-var templates;
+/*
+* props ending in $h use innerhtml
+* ... $t use [i18n]
+* */
+var templates, namaavij;
 ;(function(){
 	var index = {};
 	templates = {
@@ -3635,7 +3757,17 @@ var templates;
 			}
 			if (o.onclick) clone.onclick = o.onclick;
 			for (var i in keys) {
-				if (!isundef(o[i]) || !isundef(o[i+'$h'])) {
+				/* TODO document why this is so
+				* this doesn't let you specify i18n in templates:(
+				* cleanup previous mess from i18n
+				* */
+				if (isundef(o[i+'$t'])) {
+					if (keys[i].dataset.i18n) {
+						innertext(keys[i], '');
+						delete keys[i].dataset.i18n;
+					}
+				}
+				if ( !isundef(o[i]) || !isundef(o[i+'$h']) || !isundef(o[i+'$t']) ) {
 					if (o[i] == 'ixtaf') {
 						keys[i].hidden = 1;
 					} else
@@ -3687,7 +3819,7 @@ var templates;
 							keys[i].innerHTML = '';
 						}
 					} else
-					if (i == 'icon') { // create SVG inside
+					if (['icon', 'eqonah'].includes(i)) { // create SVG inside
 						if (typeof o[i] === 'string' && o[i].length) {
 							keys[i].hidden = 0;
 							var e = eqonaat.querySelector('#'+o[i]);
@@ -3699,9 +3831,14 @@ var templates;
 						}
 					} else {
 						if (keys[i].hidden) keys[i].hidden = 0;
-						var html = o[i+'$h'];
-						if (!isundef(html)) innerhtml(keys[i], html);
-						else innertext(keys[i], o[i]);
+						var html = o[i+'$h'], trjm = o[i+'$t'];
+						if (!isundef(html)) {
+							innerhtml(keys[i], html);
+						} else if (!isundef(trjm)) {
+							keys[i].dataset.i18n = trjm;
+						} else {
+							innertext(keys[i], o[i]);
+						}
 					}
 				}
 			}
@@ -3714,7 +3851,7 @@ var templates;
 		/*
 		* you can pass either an element or a name that's already indexed
 		*
-		* if only element is specified, then its clone is return
+		* if only element is specified, then its clone is returned
 		*
 		* if parent is also specified then it inserts the clone under parent
 		* and returns a function that accepts {options} to setup the clone
@@ -3724,7 +3861,7 @@ var templates;
 		* id can be used to reuse old elements
 		* */
 		get: function (element, parent, before, id) {
-			if (typeof element == 'string') element = index[element];
+			if (isstr(element)) element = index[element];
 			if (!(element instanceof HTMLElement)) return false;
 			var clone, template;
 			if (id) {
@@ -3750,6 +3887,23 @@ var templates;
 			}
 			return clone;
 		},
+		/* replace element with a template
+		*
+		*/
+		replace_with: function (element, replacement) {
+			if (isstr(replacement)) replacement = index[ replacement ];
+			if (!(element instanceof HTMLElement)) return false;
+			if (!(replacement instanceof HTMLElement)) return false;
+			var clone, template;
+			clone = replacement.cloneNode(true),
+			template = clone.dataset.template,
+			delete clone.dataset.template,
+			clone.hidden = 0;
+			element.replaceWith(clone);
+			return function (o) {
+				return templates.set(clone, o, template);
+			};
+		},
 		/*
 		* indexes any htm elements marked with [template=<name>]
 		* */
@@ -3765,7 +3919,22 @@ var templates;
 		},
 	};
 	templates.index();
+	namaavij = templates;
+	namaavij.axav = namaavij.get;
 })();
+/* TODO
+* add .alias to support linking secondary keysets to a shortcut entry
+* .row1 should be animated
+* move notifications above the back button on desktop
+and they should have title desc icon
+actions can be merged into the softkeys!!
+*/
+/* FEATURES
+<element>.on_focus_prev() triggered when K.up is pressed on an element
+<element>.on_focus_next() triggered when K.dn is pressed on an element
+all keyups are pd'd, fig out logic for keydowns in .press
+modifiers now do work! 13 sep 2023
+*/
 var softkeys, K, P;
 ;(function(){
 	K = { // key code names
@@ -3788,11 +3957,11 @@ var softkeys, K, P;
 		dialog: {},
 		list: {},
 	};
+	var global_keys = ['f1', 'f2', 'f5', 'escape', K.sl, K.sr];
 	var hfizM = {}, M = {}, // mapped keys
 	current,
 	inlongpress, lastkey, lastkeytime, repeatmode,
 	index = {},
-	selectionorigin = 0,
 	removableparent = function (element) {
 		var parent = element.parentElement;
 		if (parent.dataset.focus) {
@@ -3802,18 +3971,29 @@ var softkeys, K, P;
 				return removableparent(parent);
 		}
 	},
-	updatekey = function (k) {
-		var parent, o = {}, classes = '', args = M[k];
+	updatekey = function (uid) {
+		var parent, o = {}, classes = '', args = M[uid];
 		if (!args) return;
-		if (args.length === 1) o.hidden = 1;
-		if (args[0]) o.onclick = function (e) {
-			args[0](e.key, e);
+		if (args.length === 1 || args.hidden || args.h) o.hidden = 1;
+		var callback = args[0] || args.callback;
+		var k = args.key || uid;
+		if (callback) o.onclick = function (e) {
+			var key = e ? e.key: undefined;
+			callback(key, e);
 		};
-		o.label = args[1] || '';
-		o.icon = args[2];
-		o.status = args[3];
+		o.name = args.name || args.n || '';
+		o.label = args[1] || args.label || args.l || '';
+		o.icon = args[2] || args.icon || args.i;
+		o.status = args[3] || args.status || args.s;
 		if (o.icon === false) {
 			o.name = k;
+		}
+		if (!isarr(args)) { // only .add API
+			o.key = (args.ctrl ? 'ctrl ' : '')
+						+ (args.alt ? 'alt ' : '')
+						+ (args.shift ? 'shift ' : '')
+						+ (args.key || uid)
+						;
 		}
 		if ( k == K.sl ) classes = 'left' ;
 		if ( k == K.en ) classes = 'center';
@@ -3872,8 +4052,7 @@ var softkeys, K, P;
 		P: P,
 		K: K,
 		saveto: 7,
-		/*
-		* clear previous map explicitly, .map doesn't clear it by default
+		/* clear previous map explicitly, .map doesn't clear it by default
 		* */
 		clear: function () {
 			M = {};
@@ -3888,7 +4067,7 @@ var softkeys, K, P;
 			M[name][3] = yes ? 1: undefined;
 			softkeys.update();
 		} },
-		talaf: function (name) {
+		talaf: function (name) { // TODO deprecate, NEW remove
 			if (name) {
 				if (name instanceof Array) {
 					name.forEach(function (n) {
@@ -3909,16 +4088,17 @@ var softkeys, K, P;
 		},
 		showhints: function () {
 			delete softkeysui.dataset.hidden;
+			setdata(softkeysui, 'shown', 1);
 			if (!skhelp.hidden) {
 				skhelp.hidden = 1;
 				preferences.set(7, 1);
 			}
 			$.taxeer('softkeyshints', function () {
+				popdata(softkeysui, 'shown');
 				softkeysui.dataset.hidden = 1;
 			}, 2500);
 		},
-		/*
-		* remember one or more actions which you can recall later
+		/* remember one or more actions which you can recall later
 		* you can also forget stored actions
 		* */
 		hfiz: function (name) { // remember
@@ -3948,11 +4128,18 @@ var softkeys, K, P;
 		* update a single key definition in M
 		* status 0normal 1selected 2disabled
 		* */
-		set: function (name, callback, label, icon, status) {
+		set: function (name, callback, label, icon, status) { // TODO deprecate for add
 			if (name) {
-				if (name instanceof Array) {
-					name.forEach(function (n) {
-						adaaf(n, callback, label, icon, status);
+				if (isarr(name)) {
+					name.forEach(function (n, i) {
+						var labeli = label;
+						if (isarr(label)) labeli = label[i];
+						var iconi = icon;
+						if (isarr(icon)) iconi = icon[i];
+						if (i)
+						adaaf(n, callback, name[0], iconi, status);
+						else
+						adaaf(n, callback);
 					});
 				} else {
 					adaaf(name, callback, label, icon, status);
@@ -3960,7 +4147,35 @@ var softkeys, K, P;
 				softkeys.update(name);
 				backstack.set('softkeys', M);
 			}
-			return softkeys;
+			return this;
+		},
+		add: function (o) { // use this instead of .set
+			/* key uid is based on mods + keyname
+			properties
+			uid generated, you can later use it to remove keys
+			n name
+			h hidden
+			i icon
+			l label
+			s status
+			k key
+			c cb callback
+			*/
+			o.callback = o.callback || o.c || o.cb;
+			o.key = tolower(o.key || o.k);
+			if ( isfun(o.callback) && isstr(o.key) ) {
+				o.uid = (o.ctrl ? 1: 0) +'-'+
+						(o.alt ? 1: 0) +'-'+
+						(o.shift ? 1: 0) +'-'+
+						o.key;
+				M[ o.uid ] = o;
+				updatekey(o.uid);
+				backstack.set('softkeys', M);
+			}
+			return this;
+		},
+		remove: function (uid) { // use this instead of .talaf
+			this.talaf(uid);
 		},
 		/*
 		* preset P.<name>
@@ -3993,7 +4208,7 @@ var softkeys, K, P;
 				M[k][0](k, e, e && e.type, longpress) && pd(); // prevent default if true is returned
 		},
 		press: function (k, e, longpress) {
-			var pd = function () { preventdefault(e); }, caught;
+			var caught, pd = function () { preventdefault(e); };
 			kraw = k;
 			k = k.toLowerCase();
 			if (e && e.type && e.type == 'mousewheel') {
@@ -4007,13 +4222,21 @@ var softkeys, K, P;
 				k = K.sr, pd();
 			if (k == K.mt) pd();
 			var editmode = 0, a = document.activeElement, dir;
-			if ((a instanceof HTMLTextAreaElement && a.type != 'range') || a.contentEditable == 'true') {
-				if (e && e.altKey || [K.sl, K.sr].includes(k)) {} else caught = 1;
+			var left_key = K.lf,
+				right_key = K.rt;
+			if ((a instanceof HTMLTextAreaElement) || a.contentEditable == 'true') {
+				if (e && e.altKey || [K.sl, K.sr].includes(k)) {
+				} else {
+				}
 			}
-			if ((a instanceof HTMLInputElement
-			|| a instanceof HTMLTextAreaElement) && a.type != 'range') {
-				editmode = 1,
-				dir = translate.direction(a.value);
+			if ((a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement || a.contentEditable == 'true')
+			&& a.type != 'range') {
+				editmode = 1;
+				if (a.contentEditable == 'true') {
+					dir = translate.direction(a.innerText);
+				} else {
+					dir = translate.direction(a.value);
+				}
 				a.dir = dir === 1 ? 'rtl' : 'ltr';
 			}
 			if (a instanceof HTMLButtonElement) {
@@ -4024,31 +4247,58 @@ var softkeys, K, P;
 					if (parent) parent.remove();
 					pd();
 				}
+				if ( isfun(a.on_focus_prev) && (k == K.up || k == left_key) ) {
+					caught = 1;
+					pd();
+					a.on_focus_prev();
+					return;
+				}
+				if ( isfun(a.on_focus_next) && (k == K.dn || k == right_key) ) {
+					caught = 1;
+					pd();
+					a.on_focus_next();
+					return;
+				}
 			}
-			/*
+			var length = 0, selectionStart = 0;
+			/* TODO test left/right keys on buttons and single line inputs
 			* always allow using up/down keys to move between fields
+			* left/right should detect language direction
 			* */
 			if (editmode) {
-				var atend = (a.value.length === a.selectionStart),
-					atstart = (0 === a.selectionStart);
-				if (atstart && k == K.up) caught = focusprev(a), pd();
-				if (atend && k == K.dn) caught = focusnext(a), pd();
-				else if (k == K.en && e.shiftKey && a.uponshiftenter) a.uponshiftenter(), pd();
-				else if (k == K.en && !e.shiftKey && a.uponenter) a.uponenter(), pd();
+				if (a.contentEditable == 'true') {
+					length = a.textContent.length;
+					selectionStart = getSelection().baseOffset;
+				} else {
+					length = a.value.length;
+					selectionStart = a.selectionStart;
+				}
+				var atend = (length === selectionStart),
+					atstart = (0 === selectionStart);
+				if ( atstart && (k == K.up || k == left_key) && !e.altKey ) { // MERGE ?
+					if ( isfun(a.on_focus_prev) ) { caught = 1; pd(); a.on_focus_prev(); return; }
+					caught = focusprev(a), pd();
+				}
+				if ( atend && (k == K.dn || k == right_key) && !e.altKey ) { // MERGE ?
+					if ( isfun(a.on_focus_next) ) { caught = 1; pd(); a.on_focus_next(); return; }
+					caught = focusnext(a), pd();
+				}
+				else
+				if (k == K.en && e.shiftKey && a.uponshiftenter) a.uponshiftenter(atstart, atend), pd();
+				else if (k == K.en && !e.shiftKey && a.uponenter ) a.uponenter (atstart, atend), pd();
 			}
 			else if (a) {
-				if ( navigables.includes( a.tagName.toLowerCase() )
+				if ( is_navigable( a )
 					|| a.parentElement.dataset.focus ) {
-					if (k == K.up) caught = focusprev(a), pd();
-					if (k == K.dn) caught = focusnext(a), pd();
+					if (k == K.up || k == left_key) caught = focusprev(a), pd();
+					if (k == K.dn || k == right_key) caught = focusnext(a), pd();
 					if (k == K.en && a.onclick) a.onclick(), pd();
 				}
 			}
-			/*
-			* if text field isn't empty, disable arrow key handling
+			/* if text field isn't empty, disable arrow key handling
 			* K.bs is managed by KaiOS
 			* */
-			if (editmode && !a.value.length) {
+			if (editmode && !length) {
 				if (k == K.bs) {
 					if (a.dataset.removable)
 						caught = focusprev(a), a.remove(), pd();
@@ -4056,45 +4306,24 @@ var softkeys, K, P;
 						/*Hooks.run('back'), webapp.blur(), */pd();
 				}
 			}
-			if (editmode && a.value.length
-			&& [K.up, K.dn, K.lf, K.rt, K.en].includes(k)) {
-				/*if (k == K.en)
-					if (selectionorigin === undefined)
-						softkeys.set(K.en, function () {
-							selectionorigin = undefined;
-						}, 0, 'iconcopy', 1),
-						selectionorigin = a.selectionStart;
-					else
-						softkeys.set(K.en, function () {
-							selectionorigin = a.selectionStart;
-						}, 0, 'iconcopy', 0),
-						selectionorigin = undefined;*/
-				if (selectionorigin !== undefined) {
-					if (a.selectionStart < selectionorigin) // backwards
-						selectiondirection = 0;
-					else if (a.selectionStart > selectionorigin) // forwards
-						selectiondirection = 1;
-					if (k == K.lf && a.selectionEnd == selectionorigin)
-						a.selectionEnd = selectionorigin, --a.selectionStart, pd();
-					else if (k == K.rt && a.selectionStart-a.selectionEnd)
-						a.selectionStart = selectionorigin, ++a.selectionEnd, pd();
-					else if (k == K.rt && a.selectionEnd < a.value.length)
-						++a.selectionEnd, pd();
-					else if (k == K.lf && a.selectionStart > -1)
-						--a.selectionStart, pd();
-					else if (k == K.lf && a.selectionStart)
-						--a.selectionStart, pd();
-				}
-				return;
-			} else {
-				selectionorigin = undefined;
-			}
 			caught = caught || Hooks.rununtilconsumed('softkey', [k, e || {}, e && e.type, longpress]);
 			if (caught) return;
 			var mmm = M[kraw] || M[k];
-			if (mmm && typeof mmm[0] == 'function')
-				mmm[0](k, e, e && e.type, longpress) && pd(); // prevent default if true is returned
-			else {
+			/* if defined key has ctrl yes; then just in that case let it through
+			*/
+			var let_through, callback = mmm ? mmm[0] : 0;
+			var event = e || {};
+			var uid = (event.ctrlKey?1:0) +'-'+ (event.altKey?1:0) +'-'+ (event.shiftKey?1:0) +'-'+ k;
+			if (M[uid]) {
+				mmm = M[uid];
+				callback = mmm.callback;
+				let_through = 1;
+			}
+			if ( (!editmode || e.altKey || let_through || global_keys.includes(k)) && mmm && isfun(callback)
+			) {
+				caught = callback(k, e, e && e.type, longpress);
+				if ( caught ) pd(); // prevent default if true is returned
+			} else {
 				/*if (k == K.dn) {
 					webapp.scrollx(40);
 					pd();
@@ -4112,9 +4341,21 @@ var softkeys, K, P;
 					pd();
 				}*/
 			}
+			if (isundef(caught) || caught == 1) { // true|1|undef = yes; 0|false = no
+				var softkey_element = elementbyid( 'sk'+k );
+				if (softkey_element) {
+					setdata(softkey_element, 'hawm', 1);
+					$.taxeer('sk'+k, function () {
+						popdata(softkey_element, 'hawm');
+					}, 400);
+				}
+			}
 		},
 	};
 	softkeys.showhints();
+	softkeys.M = function () {
+		return M;
+	};
 	var autoheight = function (a) {
 		if (a instanceof HTMLTextAreaElement) {
 			setcss(a, 'height', 0);
@@ -4126,7 +4367,7 @@ var softkeys, K, P;
 	var resize = function () {
 		var w = innerwidth(), sl = index[K.sl], sr = index[K.sr];
 		if (w > 720) {
-			var ww = ((innerwidth()-640)/2);
+			var ww = ((innerwidth()-590)/2);
 			if (sl) setcss(sl, 'width', ww+'px');
 			if (sr) setcss(sr, 'width', ww+'px');
 		} else {
@@ -4139,9 +4380,11 @@ var softkeys, K, P;
 	});
 	resize();
 	Hooks.set('contextmenu', function (e) {
-		var a = document.activeElement
+		var a = document.activeElement;
 		if (a && (a instanceof HTMLInputElement
+		|| a.contentEditable == 'true'
 		|| a instanceof HTMLTextAreaElement) && a.type != 'range') {
+			softkeys.showhints();
 		} else {
 			softkeys.showhints();
 			return 1;
@@ -4403,14 +4646,18 @@ var themes;
 	var store = {
 		0: {
 			status: 'rgba(0,0,0,0.6)',
+			statusm: 'rgba(0,0,0,0.2)',
 			textl: '#fff',
 			text: '#ddd',
 			textd: '#aaa',
+			textdt: '#aaaaaa55',
 			textxd: '#777',
+			textxdt: '#77777755',
 			primaryl: '#050505',
 			primary: 'black',
 			primaryd: 'black',
 			primaryt: 'rgba(0,0,0,0.8)', // perfect transparent level
+			primaryxt: 'rgba(0,0,0,0.4)',
 			secondaryl: '#353535',
 			secondary: '#333',
 			secondaryd: '#252525',
@@ -4422,6 +4669,7 @@ var themes;
 			accentl: '#4ccbfc',
 			accent: '#04baf5',
 			accentt: 'rgba(4, 186, 245, 0.7)',
+			accentxt: 'rgba(4, 186, 245, 0.4)',
 			accentd: '#0284c0',
 			accentdt: 'rgba(4, 126, 205, 0.7)',
 			green: '#0c0',
@@ -4432,14 +4680,18 @@ var themes;
 },
 		1: {
 			status: 'rgba(0,0,0,0.6)',
+			statusm: 'rgba(0,0,0,0.2)',
 			textl: '#111',
 			text: '#333',
 			textd: '#666',
+			textdt: '#66666655',
 			textxd: '#888',
+			textxdt: '#88888855',
 			primaryl: '#e6e6e6',
 			primary: '#fff',
 			primaryd: '#d6d6d6',
 			primaryt: 'rgba(255,255,255,0.8)', // perfect transparent level
+			primaryxt: 'rgba(255,255,255,0.4)',
 			secondaryl: '#e6e6e6',
 			secondary: '#d6d6d6',
 			secondaryd: '#c6c6c6',
@@ -4451,6 +4703,7 @@ var themes;
 			accentl: '#0bb8cb',
 			accent: '#00609a',
 			accentt: 'rgba(0, 67, 113, 0.7)',
+			accentxt: 'rgba(0, 67, 113, 0.4)',
 			accentd: '#004371',
 			accentdt: 'rgba(0, 37, 93, 0.7)',
 			green: '#0c0',
@@ -4533,10 +4786,14 @@ var themes;
 		P = softkeys.P; // presets
 		switch (args.name) {
 			case 'main':
-				softkeys.set(1, function (k, e) {
-					themes.toggle();
-					e && e.preventDefault();
-				}, '1', 'icontheme');
+				softkeys.add({ n: 'Theme',
+					k: '1',
+					i: 'icontheme',
+					c: function (k, e) {
+						themes.toggle();
+						e && e.preventDefault();
+					}
+				});
 				break;
 		}
 	});
@@ -4749,6 +5006,7 @@ var dialog;
 	});
 	Hooks.set('navigationpress', function (args) {
 		var isbutton = 0;
+		if (isarr(args[2]))
 		args[2].forEach(function (item) {
 			if (item instanceof HTMLButtonElement
 			|| item instanceof HTMLInputElement
@@ -5105,9 +5363,36 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 		}
 	});
 	Hooks.set('bahac', function (rawstring) {
-		var string = nazzaf(rawstring).trim();
-		if (string.length) {
-			var results = [], count = 0, surahcount = 0;
+		var string = nazzaf(rawstring).trim(), results = [];
+		if ( string.match(/[0-9\:\ ]+/i) ) {
+			var splat = string.split(':');
+			splat = splat.map(function (e) {
+				return parseint( e.trim() );
+			});
+			var surah = splat[0], ayah = splat[1]-1;
+			var metadata = meta.surahs[surah];
+			if (metadata && cached[surah]) {
+				results.push({
+					id: surah,
+					surah: parseInt(surah),
+					ayah: 0,
+					title: surah + ' ' + metadata[4],
+					body: metadata[6],
+				});
+				var ayahtext = cached[surah][ayah];
+				if (ayahtext) {
+					results.push({
+						titlehide: hawalah(surah, ayah),
+						surah: parseInt(surah),
+						ayah: parseInt(ayah),
+						id: surah+':'+ayah,
+						bodyshowhtml: ayahtext,
+					});
+				}
+			}
+		}
+		if ( string.length ) {
+			var count = 0, surahcount = 0;
 			for (var i = 1; i <= 114 && surahcount < 3; ++i) {
 				var metadata = meta.surahs[i];
 				if (nazzaf(metadata[4]).includes(string)
