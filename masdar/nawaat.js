@@ -632,6 +632,7 @@ $.unload = function (mods, fn) {
 
 ;(function (){
 	// TODO: move queue requests here, only the XHR parts
+	// TODO make a way to check if a fetch request is active
 	// qr is deprecated henceforth, use queue with fetch for the same effect
 	// fetch by default uses XHRs but it can also use node requests
 	$.queuerequest = function () {
@@ -717,7 +718,10 @@ $.unload = function (mods, fn) {
 						var onend = function (errtype) {
 //							$.log.s( 'onend', carriedthis.name );
 							typeof options.callback === 'function' && options.callback('', errtype || request.status);
-							carriedthis.cnt++; carriedthis.process(carriedthis); carriedthis.active = false; return carriedthis.cnt;
+							carriedthis.cnt++;
+							carriedthis.process(carriedthis);
+							carriedthis.active = false;
+							return carriedthis.cnt;
 						};
 						
 						request.onreadystatechange = function() {
@@ -725,7 +729,10 @@ $.unload = function (mods, fn) {
 								if (request.status === 200) {
 	
 									typeof options.callback === 'function' && options.callback(request.responseText);
-									carriedthis.cnt++; carriedthis.process(carriedthis); carriedthis.active = false; return carriedthis.cnt;
+									carriedthis.cnt++;
+									carriedthis.process(carriedthis);
+									carriedthis.active = false;
+									return carriedthis.cnt;
 
 								} else {
 									onend(request.status);
@@ -819,6 +826,8 @@ $.unload = function (mods, fn) {
 			uri:		uri, 
 			payload:	(data || null), 
 			headers:	headers || 0,
+			// todo better way to specify type and move body to uri?-
+			// these improvements should be intro'd in $.axav!!
 			type:		(data ? 'post' : 'get'),
 			callback:	function (body, err) {
 				try {

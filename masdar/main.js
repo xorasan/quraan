@@ -381,37 +381,57 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 				softkeys.set(K.rt, function () {
 					main.next();
 				});
-				
-				softkeys.set(K.dn, function () {
-					if (webapp.isatbottom())
-						return main.nextayah();
-				}, 'd', 'XPO.iconkeyboardarrowdown');
-				softkeys.set(K.up, function () {
-					if (webapp.isatop())
-						return main.prevayah();
-				}, 'u', 'XPO.iconkeyboardarrowup');
 
 				softkeys.set(K.en, function () {
 					main.hifz(0, 1);
 					webapp.itlaa3(['XPO.bookmarked']);
 					return 1;
 				}, 0, 'XPO.iconbookmarkborder');
-				softkeys.set('5', function () {
-					main.hifz(1, 1);
-					main.show();
-					webapp.itlaa3(['XPO.restored']);
-					return 1;
-				}, '5', 'XPO.iconhistory');
 
-				softkeys.set('7', function () {
-					meaningstoggle();
-					settings.jaddad(settingsuid);
-					return 1;
-				}, '7', 'XPO.icontranslate');
+				softkeys.add({ n: 'Up',
+					k: K.up,
+					i: 'XPO.iconkeyboardarrowup',
+					c: function () {
+						if (webapp.isatop()) return main.prevayah();
+					},
+				});
+				softkeys.add({ n: 'Down',
+					k: K.dn,
+					i: 'XPO.iconkeyboardarrowdown',
+					c: function () {
+						if (webapp.isatbottom()) return main.nextayah();
+					},
+				});
 
-				softkeys.set(K.sl, function () {
-					Hooks.run('XPO.view', 'XPO.surahs');
-				}, 0, 'XPO.iconmenu');
+				softkeys.add({ n: 'Restore',
+					k: 'r', // Add secondary 5
+					alt: 1,
+					i: 'XPO.iconhistory',
+					c: function () {
+						main.hifz(1, 1);
+						main.show();
+						webapp.itlaa3(['XPO.restored']);
+						return 1;
+					},
+				});
+				softkeys.add({ n: 'Translation',
+					k: 't', // Add secondary 7
+					ctrl: 1,
+					i: 'XPO.icontranslate',
+					c: function () {
+						meaningstoggle();
+						settings.jaddad(settingsuid);
+						return 1;
+					},
+				});
+
+				softkeys.add({ n: 'Chapters',
+					k: K.sl,
+					i: 'XPO.iconmenu',
+					c: function () {
+						Hooks.run('XPO.view', 'XPO.surahs');
+					},
+				});
 				break;
 		}
 	});

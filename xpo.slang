@@ -1,4 +1,5 @@
 iconkeyboardarrowdown iconkeyboardarrowdown
+iconfeaturedplaylist  iconfeaturedplaylist
 navigationlongpress   navigationlongpress
 iconkeyboardarrowup   iconkeyboardarrowup
 softkeysautoheight    softkeysautoheight
@@ -14,13 +15,16 @@ statusbarshadow       statusbarshadow
 backstackdialog       backstackdialog
 seeghahjadeedah       seeghahjadeedah
 translateupdate       translateupdate
+iconbrightness7       iconbrightness7
 navigationstart       navigationstart
 navigationpress       navigationpress
 realdatereplace       realdatereplace
+saveto_contrast       saveto_contrast
 narrowerletters       narrowerletters
 webapptouchdir        webapptouchdir
 backstacksheet        backstacksheet
 backstackfocus        backstackfocus
+iconformatsize        iconformatsize
 resizesoftkeys        resizesoftkeys
 softkeysminmax        softkeysminmax
 scrolltobottom        scrolltobottom
@@ -30,9 +34,12 @@ uponshiftenter        uponshiftenter
 iconarrowback         iconarrowback
 backstackview         backstackview
 backstackmain         backstackmain
+iconplayarrow         iconplayarrow
+iconbugreport         iconbugreport
+icondaterange         icondaterange
+icontranslate         icontranslate
 softkeyshints         softkeyshints
 navigationend         navigationend
-icontranslate         icontranslate
 fetchchannels         fetchchannels
 uponpaststart         uponpaststart
 _katabmowdoo3         _katabmowdoo3
@@ -44,6 +51,7 @@ transparency          transparency
 webappresize          webappresize
 keyboardopen          keyboardopen
 bahaconpress          bahaconpress
+settingsitem          settingsitem
 iconsettings          iconsettings
 bodyshowhtml          bodyshowhtml
 visiblesheet          visiblesheet
@@ -82,6 +90,7 @@ loadingbox            loadingbox
 mousewheel            mousewheel
 listobject            listobject
 iconsearch            iconsearch
+iconbluron            iconbluron
 titlehours            titlehours
 softkeysui            softkeysui
 pleasewait            pleasewait
@@ -121,9 +130,10 @@ listbahac             listbahac
 searchbox             searchbox
 viewready             viewready
 backstack             backstack
-titlei18n             titlei18n
+icontimer             icontimer
 titledays             titledays
 titletime             titletime
+titlei18n             titlei18n
 titlehtml             titlehtml
 removable             removable
 container             container
@@ -158,6 +168,7 @@ restored              restored
 profiles              profiles
 settings              settings
 calendar              calendar
+contrast              contrast
 infuture              infuture
 sseconds              sseconds
 sminutes              sminutes
@@ -183,8 +194,8 @@ hidetext              hidetext
 iconedit              iconedit
 deadline              deadline
 muxtasar              muxtasar
-bodyi18n              bodyi18n
 timeshow              timeshow
+bodyi18n              bodyi18n
 bodyhtml              bodyhtml
 template              template
 skbutton              skbutton
@@ -458,6 +469,7 @@ pager                 pager
 error                 error
 redbg                 redbg
 a3laa                 a3laa
+high                  high
 list                  list
 form                  form
 send                  send
@@ -542,6 +554,7 @@ row1                  row1
 item                  item
 matn                  matn
 uid                   uid
+low                   low
 off                   off
 age                   age
 dir                   dir

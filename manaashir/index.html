@@ -960,6 +960,19 @@ html, body, svg text {
 	transition:opacity .2s ease-in;
 }
 	
+.settingsitem {
+	padding:9px 0;
+	border:1px solid transparent !important;
+	border-radius:8px;
+}
+	
+@media (min-width:540px) {
+	.settingsitem .icon svg {
+		width:48px;
+		height:48px;
+	}
+}
+	
 #softkeysui {
 	position:fixed;
 	bottom:0;
@@ -1389,7 +1402,7 @@ html, body, svg text {
 					<div class=grow>
 						<b data-i18n=build></b>
 						
-						<div> 176</div>
+						<div> 183</div>
 						</div>
 					
 					<div class=grow>
@@ -1405,6 +1418,14 @@ html, body, svg text {
 			
 			<hr>
 			<div data-id=ad></div>
+			</div>
+		
+		<div class="listitem flex vertical centertext pad settingsitem" data-template=settingsitem>
+			<div class=icon data-id=icon data-icon=iconsettings></div>
+			
+			<div class=bold data-id=title></div>
+			
+			<div class=dim data-id=body></div>
 			</div>
 		
 		<div id=softkeysui dir=ltr>

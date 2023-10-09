@@ -211,6 +211,9 @@ return 'html, body {'
 +'\n	background:'+o.tertiaryt+';'
 +'\n	box-shadow:0 0 12px 0px '+o.primaryl+';'
 +'\n}'
++'\n.settingsitem[data-selected] {'
++'\n	border:1px solid '+o.accent+' !important;'
++'\n}'
 +'\n#softkeysui {'
 +'\n	background:linear-gradient(0deg, '+o.primary+' 5%, '+o.primaryt+' 15%, transparent);'
 +'\n}'
@@ -867,13 +870,19 @@ $.unload = function (mods, fn) {
 						};
 						var onend = function (errtype) {
 							typeof options.callback === 'function' && options.callback('', errtype || request.status);
-							carriedthis.cnt++; carriedthis.process(carriedthis); carriedthis.active = false; return carriedthis.cnt;
+							carriedthis.cnt++;
+							carriedthis.process(carriedthis);
+							carriedthis.active = false;
+							return carriedthis.cnt;
 						};
 						request.onreadystatechange = function() {
 							if (request.readyState == 4) {
 								if (request.status === 200) {
 									typeof options.callback === 'function' && options.callback(request.responseText);
-									carriedthis.cnt++; carriedthis.process(carriedthis); carriedthis.active = false; return carriedthis.cnt;
+									carriedthis.cnt++;
+									carriedthis.process(carriedthis);
+									carriedthis.active = false;
+									return carriedthis.cnt;
 								} else {
 									onend(request.status);
 								}
@@ -974,7 +983,7 @@ $.unload = function (mods, fn) {
 })();
 $._r();
 'use strict';
-var taraajim = {"en":{"ayaat":"Ayaat","bookmarked":"Bookmarked","restored":"Restored","showmeanings":"Meanings","results":"Results","search":"Search","nosearchresults":"No search results","profile":"Profile","profiles":"Profiles","noprofiles":"No Profiles","aqrabaa":"Favorites","noaqrabaa":"No Favorites","settings":"Settings","requestfeat":"Request Feature","reportbug":"Report Bug","author":"Author","build":"Build","openad":"Ad","quality":"Quality","largetext":"Large Text","transparency":"Transparency","calendar":"Calendar","hijri":"Hijri","gregorian":"Gregorian","builton":"Built On","skhelp":"Press # for actions","softkeystouchdpad":"Touchscreen D-Pad","theme":"Theme","black":"Black","white":"White","infuture":"in","justnow":"just now","sseconds":"s","secondsago":"secs","aminuteago":"a min","minute":"min","sminutes":"m","minutes":"mins","minutesago":"mins","anhourago":"an hr","hourago":"hr","hoursago":"hrs","yesterday":"yesterday","tomorrow":"tomorrow","adayago":"a day","dayago":"d","daysago":"d","lastmonth":"last month","monthago":"mo","monthsago":"mo","lastyear":"last year","yearago":"y","yearsago":"y","alongtime":"a long time","sunday":"sunday","monday":"monday","tuesday":"tuesday","wednesday":"wednesday","thursday":"thursday","friday":"friday","saturday":"saturday",",":",","am":"am","pm":"pm","st":"st","nd":"nd","rd":"rd","th":"th","timeformat":"Time Format","hours24":"24 hour","hours12":"12 hour","language":"Language","en":"English","ar":"Arabic","ur":"Urdu","ru":"Russian","de":"German","es":"Spanish","loading":"Loading...","exiting":"Exiting...","unsupported":"Your device can't run this app","off":"Off","on":"On","animations":"Animations","webapptouchdir":"Touch affects direction"}};
+var taraajim = {"en":{"ayaat":"Ayaat","bookmarked":"Bookmarked","restored":"Restored","showmeanings":"Meanings","results":"Results","search":"Search","nosearchresults":"No search results","profile":"Profile","profiles":"Profiles","noprofiles":"No Profiles","aqrabaa":"Favorites","noaqrabaa":"No Favorites","settings":"Settings","requestfeat":"Request Feature","reportbug":"Report Bug","author":"Author","build":"Build","openad":"Ad","quality":"Quality","largetext":"Large Text","transparency":"Transparency","calendar":"Calendar","hijri":"Hijri","gregorian":"Gregorian","builton":"Built On","skhelp":"Press # for actions","softkeystouchdpad":"Touchscreen D-Pad","theme":"Theme","black":"Black","white":"White","contrast":"Contrast","high":"High","low":"Low","infuture":"in","justnow":"just now","sseconds":"s","secondsago":"secs","aminuteago":"a min","minute":"min","sminutes":"m","minutes":"mins","minutesago":"mins","anhourago":"an hr","hourago":"hr","hoursago":"hrs","yesterday":"yesterday","tomorrow":"tomorrow","adayago":"a day","dayago":"d","daysago":"d","lastmonth":"last month","monthago":"mo","monthsago":"mo","lastyear":"last year","yearago":"y","yearsago":"y","alongtime":"a long time","sunday":"sunday","monday":"monday","tuesday":"tuesday","wednesday":"wednesday","thursday":"thursday","friday":"friday","saturday":"saturday",",":",","am":"am","pm":"pm","st":"st","nd":"nd","rd":"rd","th":"th","timeformat":"Time Format","hours24":"24 hour","hours12":"12 hour","language":"Language","en":"English","ar":"Arabic","ur":"Urdu","ru":"Russian","de":"German","es":"Spanish","loading":"Loading...","exiting":"Exiting...","unsupported":"Your device can't run this app","off":"Off","on":"On","animations":"Animations","webapptouchdir":"Touch affects direction"}};
 var Hooks, hooks;
 ;(function (){
 	'use strict';
@@ -1153,17 +1162,90 @@ toupper = function (obj) {
 	return obj.toUpperCase();
 };
 var
-select_content = function (e) {
+select_content = function (e, start, end) {
 	if (e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement) {
-		if (isfun(e.select))
+		if (isnum(start)) {
+			e.selectionStart = start || 0;
+			e.selectionEnd = end || start || 0;
+		} else if (isfun(e.select)) {
 			e.select();
+		}
 	} else {
-		var range = document.createRange();
-		range.selectNodeContents(e);
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange(range);
+		function getTextNodesIn(node) {
+			var textNodes = [];
+			if (node.nodeType == 3) {
+				textNodes.push(node);
+			} else {
+				var children = node.childNodes;
+				for (var i = 0, len = children.length; i < len; ++i) {
+					textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
+				}
+			}
+			return textNodes;
+		}
+		if (document.createRange && window.getSelection) {
+			var range = document.createRange();
+			range.selectNodeContents(e);
+			var textNodes = getTextNodesIn(e);
+			var foundStart = false;
+			var charCount = 0, endCharCount;
+			for (var i = 0, textNode; textNode = textNodes[i++]; ) {
+				endCharCount = charCount + textNode.length;
+				if (!foundStart && start >= charCount
+						&& (start < endCharCount ||
+						(start == endCharCount && i <= textNodes.length))) {
+					range.setStart(textNode, start - charCount);
+					foundStart = true;
+				}
+				if (foundStart && end <= endCharCount) {
+					range.setEnd(textNode, end - charCount);
+					break;
+				}
+				charCount = endCharCount;
+			}
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} else if (document.selection && document.body.createTextRange) {
+			var textRange = document.body.createTextRange();
+			textRange.moveToElementText(e);
+			textRange.collapse(true);
+			textRange.moveEnd("character", end);
+			textRange.moveStart("character", start);
+			textRange.select();
+		}
 	}
+},
+get_caret_position = function (e) {
+	if (e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement) {
+		return [e.selectionStart, e.selectionEnd];
+	}
+var start = 0;
+var end = 0;
+var doc = e.ownerDocument || e.document;
+var win = doc.defaultView || doc.parentWindow;
+var sel;
+if (typeof win.getSelection != "undefined") {
+sel = win.getSelection();
+if (sel.rangeCount > 0) {
+var range = win.getSelection().getRangeAt(0);
+var preCaretRange = range.cloneRange();
+preCaretRange.selectNodeContents(e);
+preCaretRange.setEnd(range.startContainer, range.startOffset);
+start = preCaretRange.toString().length;
+preCaretRange.setEnd(range.endContainer, range.endOffset);
+end = preCaretRange.toString().length;
+}
+} else if ( (sel = doc.selection) && sel.type != "Control") {
+var textRange = sel.createRange();
+var preCaretTextRange = doc.body.createTextRange();
+preCaretTextRange.moveToElementText(e);
+preCaretTextRange.setEndPoint("EndToStart", textRange);
+start = preCaretTextRange.text.length;
+preCaretTextRange.setEndPoint("EndToEnd", textRange);
+end = preCaretTextRange.text.length;
+}
+return [start, end];
 },
 enc = function (v) {
 	return encodeURIComponent(v);
@@ -1957,7 +2039,7 @@ var datepicker = datepicker || 0;
 			else {
 				preferences.set(15, 1);
 			}
-		});
+		}, 'iconplayarrow');
 	});
 })();
 ;(function(){
@@ -2669,10 +2751,15 @@ var bahaclist, bahac;
 	Hooks.set('viewready', function (args) {
 		switch (args.name) {
 			case 'main':
-				softkeys.set('*', function () {
-					Hooks.run('view', 'bahac');
-					return 1;
-				}, '*', 'iconsearch');
+				softkeys.add({ n: 'Search',
+					k: 'e', // TODO secondary *, waiting on SK secondary support
+					ctrl: 1,
+					i: 'iconsearch',
+					cb: function () {
+						Hooks.run('view', 'bahac');
+						return 1;
+					},
+				});
 				break;
 			case 'bahac':
 				webapp.header( translate('search') );
@@ -2684,12 +2771,17 @@ var bahaclist, bahac;
 					softkeys.set(K.sl, function () {
 						bahaclist.press(K.sl);
 					}, '0', 'iconedit');
-				softkeys.set('*', function () {
-					bahaclist.selected = -1;
-					bahaclist.select();
-					keys.searchbox.focus();
-					return 1;
-				}, '*', 'iconsearch');
+				softkeys.add({ n: 'Search',
+					k: 'e', // TODO secondary *, waiting on SK secondary support
+					ctrl: 1,
+					i: 'iconsearch',
+					cb: function () {
+						bahaclist.selected = -1;
+						bahaclist.select();
+						keys.searchbox.focus();
+						return 1;
+					},
+				});
 				break;
 		}
 	});
@@ -2911,21 +3003,21 @@ var preferences;
 		},
 	};
 	var buildnum = preferences.get('#', 1);
-	if ( buildnum != 176 ) {
+	if ( buildnum != 183 ) {
 		preferences.pop(3); // ruid
 		preferences.pop('@'); // last sync time
 		preferences.pop(4); // list view cache
 		preferences.pop(6); // initial sync done
 	}
-	preferences.set('#', 176);
+	preferences.set('#', 183);
 	Hooks.set('ready', function () {
-		if ( buildnum != 176 ) {
+		if ( buildnum != 183 ) {
 			$.taxeer('seeghahjadeedah', function () {
 				Hooks.run('seeghahjadeedah', buildnum);
 			}, 2000);
 		}
 	});
-	$.log.s( 176 );
+	$.log.s( 183 );
 })();
 var activity;
 ;(function(){
@@ -3418,11 +3510,11 @@ var settings, currentad;
 			});
 		}],*/
 		['reportbug', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' bug '+176);
-		}],
+			activity.abrad(myemail+'?subject='+appname+' bug '+183);
+		}, 'iconbugreport'],
 		['requestfeat', 0, function () {
-			activity.abrad(myemail+'?subject='+appname+' request '+176);
-		}],
+			activity.abrad(myemail+'?subject='+appname+' request '+183);
+		}, 'iconfeaturedplaylist'],
 		['timeformat', function () {
 			var is24 = preferences.get(24, 1);
 			return [is24 ? 'hours24' : 'hours12'];
@@ -3430,7 +3522,7 @@ var settings, currentad;
 			var is24 = preferences.get(24, 1);
 			if (is24) preferences.set(24, 0);
 			else preferences.set(24, 1);
-		}],
+		}, 'icontimer'],
 		['calendar', function () {
 			var isgregorian = preferences.get(26, 1);
 			return [isgregorian ? 'gregorian' : 'hijri'];
@@ -3438,7 +3530,7 @@ var settings, currentad;
 			var isgregorian = preferences.get(26, 1);
 			if (isgregorian) preferences.set(26, 0);
 			else preferences.set(26, 1);
-		}],
+		}, 'icondaterange'],
 		['transparency', function () {
 			var isit = preferences.get(23, 1);
 			webapp.transparency();
@@ -3447,18 +3539,18 @@ var settings, currentad;
 			var isit = preferences.get(23, 1);
 			if (isit) { preferences.set(23, 0); }
 			else { preferences.set(23, 1); }
-		}],
+		}, 'iconbluron'],
 		['largetext', function () {
 			var largetext = preferences.get(9, 1);
 			webapp.textsize();
 			return [largetext ? 'on' : 'off'];
 		}, function () {
 			preferences.set(9, preferences.get(9, 1) ? 0: 1);
-		}]
+		}, 'iconformatsize']
 	], settingslist, myemail = 'hxorasani@gmail.com', keys;
 	settings = {
-		adaaf: function (name, getvalue, onpress) { // add
-			settingsitems.push([name, getvalue, onpress]);
+		adaaf: function (name, getvalue, onpress, icon) { // add
+			settingsitems.push([name, getvalue, onpress, icon]);
 			settings.jaddad(settingsitems.length-1);
 			return settingsitems.length-1;
 		},
@@ -3473,11 +3565,10 @@ var settings, currentad;
 					uid: uid,
 				};
 				obj.index = uid;
-				obj.titlei18n = item[0];
-				if (body instanceof Array)
-					obj.bodyi18n = body[0];
-				else
-					obj.body = body;
+				obj.title$t = item[0];
+				obj.icon = item[3];
+				if (body instanceof Array) obj.body$t = body[0];
+				else obj.body = body;
 				if (settingslist) {
 					settingslist.set(obj);
 					if (backstack.states.view === 'settings')
@@ -3488,7 +3579,9 @@ var settings, currentad;
 	};
 	Hooks.set('ready', function () {
 		keys = view.mfateeh('settings');
-		settingslist = list( keys.list ).idprefix('settings');
+		settingslist = list( keys.list ).idprefix('settings')
+						.listitem('settingsitem')
+						.grid(3);
 		settingslist.beforeset = function (item, id) {
 			return item;
 		};
@@ -3712,7 +3805,7 @@ var translate, taraajim = taraajim || {}, xlate;
 			else
 				index = 0;
 			translate.change(languages[index]);
-		});
+		}, 'icontranslate');
 	});
 	xlate = translate;
 })();
@@ -4275,11 +4368,11 @@ var softkeys, K, P;
 				}
 				var atend = (length === selectionStart),
 					atstart = (0 === selectionStart);
-				if ( atstart && (k == K.up || k == left_key) && !e.altKey ) { // MERGE ?
+				if ( atstart && (k == K.up || k == left_key) && !e.altKey && !e.ctrlKey && !e.shiftKey ) { // MERGE ?
 					if ( isfun(a.on_focus_prev) ) { caught = 1; pd(); a.on_focus_prev(); return; }
 					caught = focusprev(a), pd();
 				}
-				if ( atend && (k == K.dn || k == right_key) && !e.altKey ) { // MERGE ?
+				if ( atend && (k == K.dn || k == right_key) && !e.altKey && !e.ctrlKey && !e.shiftKey ) { // MERGE ?
 					if ( isfun(a.on_focus_next) ) { caught = 1; pd(); a.on_focus_next(); return; }
 					caught = focusnext(a), pd();
 				}
@@ -4642,7 +4735,7 @@ var sheet;
 })();
 var themes;
 ;(function(){
-	var K, P, settingsuid, current = 0;
+	var K, P, settingsuid, current = 0, contrast = 0;
 	var store = {
 		0: {
 			status: 'rgba(0,0,0,0.6)',
@@ -4712,14 +4805,96 @@ var themes;
 			red: '#c00',
 			redd: '#faa',
 		},
+		2: {
+			status: 'rgba(0,0,0,0.7)',
+			statusm: 'rgba(0,0,0,0.35)',
+			textl: '#fff',
+			text: '#ddd',
+			textd: '#aaa',
+			textdt: '#aaaaaa55',
+			textxd: '#777',
+			textxdt: '#77777755',
+			primaryl: '#050505',
+			primary: 'black',
+			primaryd: 'black',
+			primaryt: 'rgba(0,0,0,0.8)', // perfect transparent level
+			primaryxt: 'rgba(0,0,0,0.4)',
+			secondaryl: '#555',
+			secondary: '#444',
+			secondaryd: '#333',
+			secondaryt: 'rgba(60,60,60,0.8)',
+			tertiaryl: '#777',
+			tertiary: '#666',
+			tertiaryd: '#555',
+			tertiaryt: 'rgba(83,83,83,0.8)',
+			accentl: '#4ccbfc',
+			accent: '#04baf5',
+			accentt: 'rgba(4, 186, 245, 0.7)',
+			accentxt: 'rgba(4, 186, 245, 0.4)',
+			accentd: '#0284c0',
+			accentdt: 'rgba(4, 126, 205, 0.7)',
+			green: '#0c0',
+			yellow: '#ca0',
+			redl: '#f99',
+			red: '#c00',
+			redd: '#900',
+},
+		3: {
+			status: 'rgba(0,0,0,0.6)',
+			statusm: 'rgba(0,0,0,0.2)',
+			textl: '#111',
+			text: '#333',
+			textd: '#666',
+			textdt: '#66666655',
+			textxd: '#888',
+			textxdt: '#88888855',
+			primaryl: '#e6e6e6',
+			primary: '#fff',
+			primaryd: '#d6d6d6',
+			primaryt: 'rgba(255,255,255,0.8)', // perfect transparent level
+			primaryxt: 'rgba(255,255,255,0.4)',
+			secondaryl: '#e6e6e6',
+			secondary: '#d6d6d6',
+			secondaryd: '#c6c6c6',
+			secondaryt: 'rgba(180,180,180,0.8)',
+			tertiaryl: '#eee',
+			tertiary: '#ddd',
+			tertiaryd: '#ccc',
+			tertiaryt: 'rgba(204,204,204,0.8)',
+			accentl: '#0bb8cb',
+			accent: '#00609a',
+			accentt: 'rgba(0, 67, 113, 0.7)',
+			accentxt: 'rgba(0, 67, 113, 0.4)',
+			accentd: '#004371',
+			accentdt: 'rgba(0, 37, 93, 0.7)',
+			green: '#0c0',
+			yellow: '#ca0',
+			redl: '#900',
+			red: '#c00',
+			redd: '#faa',
+		},
 	};
+	function set_theme_with_contrast(theme) {
+		if (contrast) { // high
+			if ( theme ) { // white
+				themes.set(3);
+			} else { // black
+				themes.set(2);
+			}
+		} else { // low
+			if ( theme ) { // white
+				themes.set(1);
+			} else { // black
+				themes.set(0);
+			}
+		}
+	}
 	themes = {
-		/*
-		* in preferences (using localStorage), use this key to remember theme
+		/* in preferences (using localStorage), use this key to remember theme
 		* */
 		saveto: 19,
-		/*
-		* +changes the theme if only the theme name is provided
+		saveto_contrast: '19c',
+		/* +changes the theme if only the theme name is provided
 		* theme is a string, refers to an object inside store
 		* this objects contains key:value pairs
 		* that refer to slang css variables
@@ -4736,11 +4911,10 @@ var themes;
 				themes.set(current);
 			}
 			if (arglen === 1) {
-				if (store[theme])
-					current = theme,
-					dynamicstyle.innerHTML = updatetheme(store[theme]),
-					preferences.set(themes.saveto, current);
+				if (store[theme]) {
+					dynamicstyle.innerHTML = updatetheme(store[theme]);
 					themecolor && themecolor.setAttribute('content', themes.get('status'));
+				}
 			}
 			if (arglen === 2) {
 				store[theme] = key;
@@ -4751,8 +4925,7 @@ var themes;
 			}
 			return themes;
 		},
-		/*
-		* if only one arg is provided, assume it's the key
+		/* if only one arg is provided, assume it's the key
 		* */
 		get: function (theme, key) {
 			var arglen = arguments.length;
@@ -4765,21 +4938,33 @@ var themes;
 			return false;
 		},
 		toggle: function () {
-			current = current ? current = 0: 1;
-			themes.set(current);
+			current = current ? 0: 1;
+			set_theme_with_contrast(current);
 			settings.jaddad(settingsuid);
 		},
 	};
 	Hooks.set('ready', function () {
-		if (preferences) current = preferences.get(themes.saveto, 1) || 0;
-		themes.set(current);
+		if (preferences) {
+			current = preferences.get(themes.saveto, 1) || 0;
+			contrast = preferences.get(themes.saveto_contrast, 1) || 0;
+		}
+		set_theme_with_contrast(current);
 		settingsuid = settings.adaaf('theme', function () {
 			var iswhite = preferences.get(themes.saveto, 1);
-			themes.set(iswhite);
-			return [iswhite ? 'white' : 'black' ];
+			current = iswhite ? 1: 0;
+			set_theme_with_contrast(current);
+			return [ iswhite ? 'white' : 'black' ];
 		}, function () {
 			preferences.set(themes.saveto, preferences.get(themes.saveto, 1) ? 0: 1);
-		});
+		}, 'icontheme');
+		settingsuid = settings.adaaf('contrast', function () {
+			var ishigh = preferences.get(themes.saveto_contrast, 1);
+			contrast = ishigh ? 1: 0;
+			set_theme_with_contrast(current);
+			return [ ishigh ? 'high' : 'low' ];
+		}, function () {
+			preferences.set(themes.saveto_contrast, preferences.get(themes.saveto_contrast, 1) ? 0: 1);
+		}, 'iconbrightness7');
 	});
 	Hooks.set('viewready', function (args) {
 		K = softkeys.K, // key names
@@ -5466,33 +5651,53 @@ var main, replacements = {}, surahs = {}, cached = {}, meanings = {};
 				softkeys.set(K.rt, function () {
 					main.next();
 				});
-				softkeys.set(K.dn, function () {
-					if (webapp.isatbottom())
-						return main.nextayah();
-				}, 'd', 'iconkeyboardarrowdown');
-				softkeys.set(K.up, function () {
-					if (webapp.isatop())
-						return main.prevayah();
-				}, 'u', 'iconkeyboardarrowup');
 				softkeys.set(K.en, function () {
 					main.hifz(0, 1);
 					webapp.itlaa3(['bookmarked']);
 					return 1;
 				}, 0, 'iconbookmarkborder');
-				softkeys.set('5', function () {
-					main.hifz(1, 1);
-					main.show();
-					webapp.itlaa3(['restored']);
-					return 1;
-				}, '5', 'iconhistory');
-				softkeys.set('7', function () {
-					meaningstoggle();
-					settings.jaddad(settingsuid);
-					return 1;
-				}, '7', 'icontranslate');
-				softkeys.set(K.sl, function () {
-					Hooks.run('view', 'surahs');
-				}, 0, 'iconmenu');
+				softkeys.add({ n: 'Up',
+					k: K.up,
+					i: 'iconkeyboardarrowup',
+					c: function () {
+						if (webapp.isatop()) return main.prevayah();
+					},
+				});
+				softkeys.add({ n: 'Down',
+					k: K.dn,
+					i: 'iconkeyboardarrowdown',
+					c: function () {
+						if (webapp.isatbottom()) return main.nextayah();
+					},
+				});
+				softkeys.add({ n: 'Restore',
+					k: 'r', // Add secondary 5
+					alt: 1,
+					i: 'iconhistory',
+					c: function () {
+						main.hifz(1, 1);
+						main.show();
+						webapp.itlaa3(['restored']);
+						return 1;
+					},
+				});
+				softkeys.add({ n: 'Translation',
+					k: 't', // Add secondary 7
+					ctrl: 1,
+					i: 'icontranslate',
+					c: function () {
+						meaningstoggle();
+						settings.jaddad(settingsuid);
+						return 1;
+					},
+				});
+				softkeys.add({ n: 'Chapters',
+					k: K.sl,
+					i: 'iconmenu',
+					c: function () {
+						Hooks.run('view', 'surahs');
+					},
+				});
 				break;
 		}
 	});
